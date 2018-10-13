@@ -6,6 +6,8 @@
 
         Vector2D GetSize();
 
+        PlayerInfo GetPlayerInfo();
+
         void Move(Direction direction);
     }
 }
