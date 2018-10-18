@@ -1,7 +1,10 @@
-﻿namespace Rhendaria.Abstraction
+﻿using Orleans;
+using System.Threading.Tasks;
+
+namespace Rhendaria.Abstraction
 {
-    public interface IRoutingActor
+    public interface IRoutingActor : IGrainWithGuidKey
     {
-        void RoutePlayerMovement(string username, Vector2D size, Vector2D position);
+        Task RoutePlayerMovement(string username, Vector2D size, Vector2D position);
     }
 }

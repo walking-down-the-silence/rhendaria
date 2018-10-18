@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CF9F5464-806
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{5A06A32A-4F4B-407D-85FF-0C54032F0ED9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhendaria.Engine.Tests", "test\Rhendaria.Engine.Tests\Rhendaria.Engine.Tests.csproj", "{56E31B79-08CF-438D-9EC5-ECE4E3078F75}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rhendaria.Engine.Tests", "test\Rhendaria.Engine.Tests\Rhendaria.Engine.Tests.csproj", "{56E31B79-08CF-438D-9EC5-ECE4E3078F75}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
