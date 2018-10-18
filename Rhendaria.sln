@@ -15,7 +15,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CF9F5464-806
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{5A06A32A-4F4B-407D-85FF-0C54032F0ED9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhendaria.Engine.Tests", "test\Rhendaria.Engine.Tests\Rhendaria.Engine.Tests.csproj", "{56E31B79-08CF-438D-9EC5-ECE4E3078F75}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rhendaria.Engine.Tests", "test\Rhendaria.Engine.Tests\Rhendaria.Engine.Tests.csproj", "{56E31B79-08CF-438D-9EC5-ECE4E3078F75}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhendaria.ConsoleClient", "Rhendaria.ConsoleClient\Rhendaria.ConsoleClient.csproj", "{BCA746E7-22E6-4CC8-A196-9E5953D7D3B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,6 +45,10 @@ Global
 		{56E31B79-08CF-438D-9EC5-ECE4E3078F75}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56E31B79-08CF-438D-9EC5-ECE4E3078F75}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56E31B79-08CF-438D-9EC5-ECE4E3078F75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCA746E7-22E6-4CC8-A196-9E5953D7D3B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCA746E7-22E6-4CC8-A196-9E5953D7D3B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCA746E7-22E6-4CC8-A196-9E5953D7D3B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCA746E7-22E6-4CC8-A196-9E5953D7D3B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +59,7 @@ Global
 		{4088D7B3-BAB9-4F04-B54F-C3C108666287} = {CF9F5464-806A-4A85-A8D0-67B0538AD99A}
 		{F26FFF89-B0C5-4AA0-88BF-FF6CE24DA938} = {CF9F5464-806A-4A85-A8D0-67B0538AD99A}
 		{56E31B79-08CF-438D-9EC5-ECE4E3078F75} = {5A06A32A-4F4B-407D-85FF-0C54032F0ED9}
+		{BCA746E7-22E6-4CC8-A196-9E5953D7D3B4} = {CF9F5464-806A-4A85-A8D0-67B0538AD99A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0647F49C-2D68-4EFB-AC09-4BD15F566444}
