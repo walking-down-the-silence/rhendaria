@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Orleans.Configuration;
 using Orleans.Hosting;
+using Orleans.Logging;
 using Rhendaria.Hosting.Interfaces;
 
 namespace Rhendaria.Hosting.Implemetation
 {
-    public class RhendariaMySqlHost : IRhendariaHost
+    public class RhendariaHost : IRhendariaHost
     {
         private ISiloHost _silo;
         public IRhendariaHostConfiguration Configuration { get; }
 
-        public RhendariaMySqlHost(IRhendariaHostConfiguration configuration)
+        public RhendariaHost(IRhendariaHostConfiguration configuration)
         {
             Configuration = configuration;
         }
@@ -40,6 +42,7 @@ namespace Rhendaria.Hosting.Implemetation
                 })
                 // Endpoints
                 .ConfigureEndpoints(Configuration.SiloInteractionPort, Configuration.GatewayPort)
+                .ConfigureLogging(s => s.SetMinimumLevel(LogLevel.Information).AddFile(Configuration.LogFile))
                 // Application parts: just reference one of the grain implementations that we use
                 //.ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(RhendariaGrain).Assembly).WithReferences())
                 // Now create the silo!

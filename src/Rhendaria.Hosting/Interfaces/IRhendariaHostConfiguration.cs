@@ -8,5 +8,6 @@
         string SqlClietInvariant { get; }
         int SiloInteractionPort { get; }
         int GatewayPort { get; }
+        string LogFile { get; }
     }
 }

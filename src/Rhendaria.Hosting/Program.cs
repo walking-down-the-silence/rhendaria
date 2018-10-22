@@ -1,13 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Orleans.Configuration;
-using Orleans.Hosting;
-using Rhendaria.Engine;
-using Orleans;
 using Rhendaria.Hosting.Implemetation;
 
 namespace Rhendaria.Hosting
@@ -26,7 +20,7 @@ namespace Rhendaria.Hosting
 
             try
             {
-                var host = await new RhendariaHostFactory().StartNewAsync(configuration);
+                var host = await new RhendariaHostFactory().StartPosgressHostAsync(configuration);
 
                 await WriteLineAsync("[OK]", ConsoleColor.Green);
 
