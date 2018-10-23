@@ -6,19 +6,19 @@ namespace Rhendaria.Engine.Services
 {
     public class RoutingService : IRoutingService
     {
-        private readonly IGameConstants _gameConstants;
+        private readonly IGameOptions _gameOptions;
 
-        public RoutingService(IGameConstants gameConstants)
+        public RoutingService(IGameOptions gameOptions)
         {
-            _gameConstants = gameConstants;
+            this._gameOptions = gameOptions;
         }
 
         public string GetZoneId(Vector2D position)
         {
             if (position == null) throw new ArgumentNullException(nameof(position));
 
-            int zoneX = position.Left / _gameConstants.ZoneWidth;
-            int zoneY = position.Top / _gameConstants.ZoneHeight;
+            int zoneX = position.Left / this._gameOptions.ZoneWidth;
+            int zoneY = position.Top / this._gameOptions.ZoneHeight;
 
             return $"zone_{zoneX}_{zoneY}";
         }
