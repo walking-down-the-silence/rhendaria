@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -73,16 +74,16 @@ namespace Rhendaria.Web
         private static IClusterClient CreateClusteClientInstance(IServiceProvider services)
         {
             IClientBuilder clientBuilder = new ClientBuilder()
+                .UseLocalhostClustering()
                 .Configure<ClusterOptions>(options =>
                 {
                     options.ClusterId = "rhendaria.server.cluster";
                     options.ServiceId = "rhendaria.server.service";
-                })
-                .UseLocalhostClustering(gatewayPort: 6000);
+                });
 
             IClusterClient client = clientBuilder.Build();
 
-            client.Connect();
+            Task.WaitAll(client.Connect());
 
             return client;
         }

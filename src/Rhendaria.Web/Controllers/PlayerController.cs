@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Rhendaria.Web.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/{username}")]
     [ApiController]
     public class PlayerController : ControllerBase
     {
@@ -16,18 +16,37 @@ namespace Rhendaria.Web.Controllers
             _client = client;
         }
 
-        [HttpGet("{username}/position")]
+        [HttpGet("position")]
         public async Task<IActionResult> GetUsername(string username)
         {
             if (string.IsNullOrWhiteSpace(username))
             {
-                return BadRequest("Username is ivalid.");
+                return BadRequest("Username cannot be null or empty.");
             }
 
             IPlayerActor playerActor = _client.GetGrain<IPlayerActor>(username);
             Vector2D position = await playerActor.GetPosition();
 
             return Ok(position);
+        }
+
+        [HttpPost("move")]
+        public async Task<IActionResult> MovePlayer(string username,[FromBody] MovementCommand command)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                return BadRequest("Username cannot be null or empty.");
+            }
+
+            IPlayerActor playerActor = _client.GetGrain<IPlayerActor>(username);
+            Vector2D position = await playerActor.Move(command.Direction);
+
+            return Ok(position);
+        }
+
+        public class MovementCommand
+        {
+            public Direction Direction { get; set; }
         }
     }
 }
