@@ -1,13 +1,16 @@
-﻿namespace Rhendaria.Abstraction
+﻿using Orleans;
+using System.Threading.Tasks;
+
+namespace Rhendaria.Abstraction
 {
-    public interface IPlayerActor
+    public interface IPlayerActor : IGrainWithStringKey
     {
-        Vector2D GetPosition();
+        Task<string> GetUsername();
 
-        Vector2D GetSize();
+        Task<Vector2D> GetPosition();
 
-        PlayerInfo GetPlayerInfo();
+        Task<Vector2D> GetSize();
 
-        void Move(Direction direction);
+        Task<Vector2D> Move(Direction direction);
     }
 }

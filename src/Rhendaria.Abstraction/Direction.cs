@@ -1,5 +1,8 @@
-﻿namespace Rhendaria.Abstraction
+﻿using System;
+
+namespace Rhendaria.Abstraction
 {
+    [Serializable]
     public enum Direction
     {
         Left,

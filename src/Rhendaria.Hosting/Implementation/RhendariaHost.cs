@@ -50,7 +50,6 @@ namespace Rhendaria.Hosting.Implementation
                 })
                 .ConfigureEndpoints(Configuration.SiloInteractionPort, Configuration.GatewayPort)
                 .ConfigureLogging(s => s.SetMinimumLevel(LogLevel.Information).AddFile(Configuration.LogFile))
-                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(RhendariaGrain).Assembly).WithReferences())
                 .Build();
 
             return silo;

@@ -1,5 +1,8 @@
-﻿namespace Rhendaria.Abstraction
+﻿using System;
+
+namespace Rhendaria.Abstraction
 {
+    [Serializable]
     public class Vector2D
     {
         public Vector2D(int left, int top)

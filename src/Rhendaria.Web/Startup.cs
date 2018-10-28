@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -8,6 +6,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Orleans;
+using Orleans.Configuration;
+using Orleans.Configuration.Overrides;
+using Orleans.Hosting;
+using Orleans.Logging;
+using Swashbuckle.AspNetCore.Swagger;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Rhendaria.Web
 {
@@ -20,22 +26,21 @@ namespace Rhendaria.Web
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<CookiePolicyOptions>(options =>
             {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddSwaggerGen(ConfigureSwagger);
+            services.AddSingleton(CreateClusteClientInstance);
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, Microsoft.AspNetCore.Hosting.IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -46,6 +51,14 @@ namespace Rhendaria.Web
                 app.UseExceptionHandler("/Home/Error");
             }
 
+            app.UseSwagger();
+            app.UseSwaggerUI(options =>
+            {
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "Rhendaria Api");
+                options.OAuthClientId("swaggerui");
+                options.OAuthAppName("Swagger UI");
+            });
+
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
@@ -55,6 +68,33 @@ namespace Rhendaria.Web
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+        }
+
+        private static void ConfigureSwagger(SwaggerGenOptions options)
+        {
+            options.SwaggerDoc("v1", new Info { Title = "Rhendaria Api", Version = "v1" });
+        }
+
+        private static IClusterClient CreateClusteClientInstance(IServiceProvider services)
+        {
+            IClientBuilder clientBuilder = new ClientBuilder()
+                .Configure<ClusterOptions>(options =>
+                {
+                    options.ClusterId = "rhendaria-cluster";
+                    options.ServiceId = "rhendaria-game-engine";
+                })
+                .UseAdoNetClustering(options =>
+                {
+                    options.ConnectionString = "User ID=postgres;Password=postgres;Host=localhost;Port=5432;Database=orleans;Pooling=true;";
+                    options.Invariant = "Npgsql";
+                })
+                .ConfigureLogging(builder => builder.SetMinimumLevel(LogLevel.Information).AddFile("OrleansWebClient.log"));
+
+            IClusterClient client = clientBuilder.Build();
+
+            Task.WaitAll(client.Connect());
+
+            return client;
         }
     }
 }
