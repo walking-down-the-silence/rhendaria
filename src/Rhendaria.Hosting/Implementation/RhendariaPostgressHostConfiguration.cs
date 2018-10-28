@@ -8,8 +8,8 @@ namespace Rhendaria.Hosting.Implementation
         {
             ServiceName = configuration["ClusterId"];
             ClusterId = configuration["ServiceName"];
-            ConnectioString = configuration["PostgressConnectionString"];
-            SqlClietInvariant = configuration["PostgressConnectionString"];
+            ConnectionString = configuration["PostgressConnectionString"];
+            SqlClientInvariant = configuration["PostgressClient"];
             SiloInteractionPort = configuration.GetValue<int>("SiloToSiloPort");
             GatewayPort = configuration.GetValue<int>("SiloGatewayPort");
             LogFile = configuration["LogFile"];

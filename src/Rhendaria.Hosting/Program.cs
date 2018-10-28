@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using Rhendaria.Hosting.Implemetation;
+using Rhendaria.Hosting.Implementation;
 
 namespace Rhendaria.Hosting
 {

@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Rhendaria.Hosting.Implementation;
 
-namespace Rhendaria.Hosting.Implemetation
+namespace Rhendaria.Hosting.Implementation
 {
     public class RhendariaMySqlHostConfiguration : RhendariaHostConfigurationBase
     {
@@ -9,8 +8,8 @@ namespace Rhendaria.Hosting.Implemetation
         {
             ServiceName = configuration["ClusterId"];
             ClusterId = configuration["ServiceName"];
-            ConnectioString = configuration["MyConnectionString"];
-            SqlClietInvariant = configuration["MySqlClient"];
+            ConnectionString = configuration["MyConnectionString"];
+            SqlClientInvariant = configuration["MySqlClient"];
             SiloInteractionPort = configuration.GetValue<int>("SiloToSiloPort");
             GatewayPort = configuration.GetValue<int>("SiloGatewayPort");
             LogFile = configuration["LogFile"];

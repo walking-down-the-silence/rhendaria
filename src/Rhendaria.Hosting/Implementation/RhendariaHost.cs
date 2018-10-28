@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.Logging;
+using Rhendaria.Engine;
 using Rhendaria.Hosting.Interfaces;
 
-namespace Rhendaria.Hosting.Implemetation
+namespace Rhendaria.Hosting.Implementation
 {
     public class RhendariaHost : IRhendariaHost
     {
@@ -37,15 +39,18 @@ namespace Rhendaria.Hosting.Implemetation
                 })
                 .UseAdoNetClustering(options =>
                 {
-                    options.Invariant = Configuration.SqlClietInvariant;
-                    options.ConnectionString = Configuration.ConnectioString;
+                    options.ConnectionString = Configuration.ConnectionString;
+                    options.Invariant = Configuration.SqlClientInvariant;
                 })
-                // Endpoints
+                .AddAdoNetGrainStorage("OrleansStorage", options =>
+                {
+                    options.ConnectionString = Configuration.ConnectionString;
+                    options.Invariant = Configuration.SqlClientInvariant;
+                    options.UseJsonFormat = true;
+                })
                 .ConfigureEndpoints(Configuration.SiloInteractionPort, Configuration.GatewayPort)
                 .ConfigureLogging(s => s.SetMinimumLevel(LogLevel.Information).AddFile(Configuration.LogFile))
-                // Application parts: just reference one of the grain implementations that we use
-                //.ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(RhendariaGrain).Assembly).WithReferences())
-                // Now create the silo!
+                .ConfigureApplicationParts(parts => parts.AddApplicationPart(typeof(RhendariaGrain).Assembly).WithReferences())
                 .Build();
 
             return silo;

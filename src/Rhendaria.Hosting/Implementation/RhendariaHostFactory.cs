@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using Rhendaria.Hosting.Implementation;
 using Rhendaria.Hosting.Interfaces;
 
-namespace Rhendaria.Hosting.Implemetation
+namespace Rhendaria.Hosting.Implementation
 {
     public class RhendariaHostFactory : IRhendariaHostFactory
     {

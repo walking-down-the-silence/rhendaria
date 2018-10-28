@@ -3,7 +3,11 @@ using Orleans;
 
 namespace Rhendaria.Engine
 {
-    public class RhendariaGrain : Grain
+    public class RhendariaGrain : Grain, IRhendariaGrain
+    {
+    }
+
+    public interface IRhendariaGrain
     {
     }
 }
