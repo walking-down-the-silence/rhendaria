@@ -24,23 +24,19 @@ namespace Rhendaria.Web.Controllers
                 return BadRequest("Username cannot be null or empty.");
             }
 
-            IPlayerActor playerActor = _client.GetGrain<IPlayerActor>(username);
-            Vector2D position = await playerActor.GetPosition();
-
+            Vector2D position = await _client.GetGrain<IPlayerActor>(username).GetPosition();
             return Ok(position);
         }
 
         [HttpPost("move")]
-        public async Task<IActionResult> MovePlayer(string username,[FromBody] MovementCommand command)
+        public async Task<IActionResult> MovePlayer(string username, [FromBody] MovementCommand command)
         {
             if (string.IsNullOrWhiteSpace(username))
             {
                 return BadRequest("Username cannot be null or empty.");
             }
 
-            IPlayerActor playerActor = _client.GetGrain<IPlayerActor>(username);
-            Vector2D position = await playerActor.Move(command.Direction);
-
+            Vector2D position = await _client.GetGrain<IPlayerActor>(username).Move(command.Direction);
             return Ok(position);
         }
 
