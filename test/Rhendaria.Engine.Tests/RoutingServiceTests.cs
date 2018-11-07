@@ -1,5 +1,6 @@
 using System;
 using FakeItEasy;
+using Microsoft.Extensions.Options;
 using Rhendaria.Abstraction;
 using Rhendaria.Engine.Services;
 using Xunit;
@@ -12,7 +13,7 @@ namespace Rhendaria.Engine.Tests
         public void GetZoneId_size100_x0_y0_Expected_zone_0_0()
         {
             // Arrange.
-            IGameOptions options = GetFakeConstant(100);
+            var options = GetFakeConstant(100);
             RoutingService service = new RoutingService(options);
             Vector2D position = new Vector2D(0, 0);
 
@@ -27,7 +28,7 @@ namespace Rhendaria.Engine.Tests
         public void GetZoneId_size100_x100_y0_Expected_zone_1_0()
         {
             // Arrange.
-            IGameOptions options = GetFakeConstant(100);
+            var options = GetFakeConstant(100);
             RoutingService service = new RoutingService(options);
             Vector2D position = new Vector2D(100, 0);
 
@@ -42,7 +43,7 @@ namespace Rhendaria.Engine.Tests
         public void GetZoneId_size100_x0_y100_Expected_zone_0_1()
         {
             // Arrange.
-            IGameOptions options = GetFakeConstant(100);
+            var options = GetFakeConstant(100);
             RoutingService service = new RoutingService(options);
             Vector2D position = new Vector2D(0, 100);
 
@@ -57,7 +58,7 @@ namespace Rhendaria.Engine.Tests
         public void GetZoneId_size100_xMinus1_yMinus1_Expected_zone_0_0()
         {
             // Arrange.
-            IGameOptions options = GetFakeConstant(100);
+            var options = GetFakeConstant(100);
             RoutingService service = new RoutingService(options);
             Vector2D position = new Vector2D(-1, -1);
 
@@ -72,7 +73,7 @@ namespace Rhendaria.Engine.Tests
         public void GetZoneId_size100_x1_y1_Expected_zone_0_0()
         {
             // Arrange.
-            IGameOptions options = GetFakeConstant(100);
+            var options = GetFakeConstant(100);
             RoutingService service = new RoutingService(options);
             Vector2D position = new Vector2D(1, 1);
 
@@ -87,7 +88,7 @@ namespace Rhendaria.Engine.Tests
         public void GetZoneId_size100_xMinus100_yMinus100_Expected_zone_Minus1_Minus1()
         {
             // Arrange.
-            IGameOptions options = GetFakeConstant(100);
+            var options = GetFakeConstant(100);
             RoutingService service = new RoutingService(options);
             Vector2D position = new Vector2D(-100, -100);
 
@@ -102,7 +103,7 @@ namespace Rhendaria.Engine.Tests
         public void GetZoneId_positionNull_Expected_exception()
         {
             // Arrange.
-            IGameOptions options = GetFakeConstant(100);
+            var options = GetFakeConstant(100);
             RoutingService service = new RoutingService(options);
             Vector2D position = null;
 
@@ -110,18 +111,20 @@ namespace Rhendaria.Engine.Tests
             Assert.Throws<ArgumentNullException>(()=>service.GetZoneId(position));
         }
 
-        private IGameOptions GetFakeConstant(int width, int? height = null)
+        private IOptions<GameOptions> GetFakeConstant(int width, int? height = null)
         {
             if (height == null)
             {
                 height = width;
             }
 
-            IGameOptions options = A.Fake<IGameOptions>();
-            A.CallTo(() => options.ZoneWidth).Returns(width);
-            A.CallTo(() => options.ZoneHeight).Returns(height.Value);
+            GameOptions options = new GameOptions
+            {
+                ZoneHeight = height.Value,
+                ZoneWidth = width
+            };
 
-            return options;
+            return Options.Create(options);
         }
     }
 }
