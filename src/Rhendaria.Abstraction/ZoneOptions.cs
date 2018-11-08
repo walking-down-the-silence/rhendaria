@@ -1,6 +1,6 @@
 ﻿namespace Rhendaria.Abstraction
 {
-    public class GameOptions
+    public class ZoneOptions
     {
         public int ZoneHeight { get; set; }
         public int ZoneWidth { get; set; }

@@ -111,14 +111,14 @@ namespace Rhendaria.Engine.Tests
             Assert.Throws<ArgumentNullException>(()=>service.GetZoneId(position));
         }
 
-        private IOptions<GameOptions> GetFakeConstant(int width, int? height = null)
+        private IOptions<ZoneOptions> GetFakeConstant(int width, int? height = null)
         {
             if (height == null)
             {
                 height = width;
             }
 
-            GameOptions options = new GameOptions
+            ZoneOptions options = new ZoneOptions
             {
                 ZoneHeight = height.Value,
                 ZoneWidth = width
