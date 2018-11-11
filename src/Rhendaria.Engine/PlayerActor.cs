@@ -25,22 +25,13 @@ namespace Rhendaria.Engine
             return Task.FromResult(State.Size);
         }
 
-        public Task<Vector2D> Move(Direction direction)
+        public async Task<Vector2D> Move(Direction direction)
         {
             Vector2D result = State.Position.Shift(direction);
             State.Position = result;
-            return Task.FromResult(result);
-        }
 
-        public override Task OnActivateAsync()
-        {
-            if (State != null)
-            {
-                State.Position = new Vector2D(0, 0);
-                State.Size = new Vector2D(10, 10);
-                State.Color = "Blue";
-            }
-            return base.OnActivateAsync();
+            await WriteStateAsync();
+            return result;
         }
     }
 }

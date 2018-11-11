@@ -6,8 +6,8 @@ namespace Rhendaria.Hosting.Implementation
     {
         public RhendariaPostgressHostConfiguration(IConfiguration configuration) : base(configuration)
         {
-            ServiceName = configuration["ClusterId"];
-            ClusterId = configuration["ServiceName"];
+            ServiceName = configuration["ServiceName"];
+            ClusterId = configuration["ClusterId"];
             ConnectionString = configuration["PostgressConnectionString"];
             SqlClientInvariant = configuration["PostgressClient"];
             SiloInteractionPort = configuration.GetValue<int>("SiloToSiloPort");

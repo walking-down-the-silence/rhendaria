@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,7 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
-using Orleans.Configuration.Overrides;
 using Orleans.Hosting;
 using Orleans.Logging;
 using Swashbuckle.AspNetCore.Swagger;
@@ -88,7 +88,10 @@ namespace Rhendaria.Web
                     options.ConnectionString = "User ID=postgres;Password=postgres;Host=localhost;Port=5432;Database=orleans;Pooling=true;";
                     options.Invariant = "Npgsql";
                 })
-                .ConfigureLogging(builder => builder.SetMinimumLevel(LogLevel.Information).AddFile("OrleansWebClient.log"));
+                .ConfigureLogging(builder =>
+                {
+                    builder.SetMinimumLevel(LogLevel.Debug).AddFile("OrleansWebClient.log");
+                });
 
             IClusterClient client = clientBuilder.Build();
 

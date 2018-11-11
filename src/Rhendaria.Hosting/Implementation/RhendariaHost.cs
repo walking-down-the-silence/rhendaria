@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.Logging;
-using Rhendaria.Engine;
 using Rhendaria.Hosting.Interfaces;
 
 namespace Rhendaria.Hosting.Implementation
@@ -42,13 +40,13 @@ namespace Rhendaria.Hosting.Implementation
                     options.ConnectionString = Configuration.ConnectionString;
                     options.Invariant = Configuration.SqlClientInvariant;
                 })
-                .AddAdoNetGrainStorage("OrleansStorage", options =>
+                .AddAdoNetGrainStorageAsDefault(options =>
                 {
                     options.ConnectionString = Configuration.ConnectionString;
                     options.Invariant = Configuration.SqlClientInvariant;
                     options.UseJsonFormat = true;
                 })
-                .ConfigureEndpoints(Configuration.SiloInteractionPort, Configuration.GatewayPort)
+                .ConfigureEndpoints(Configuration.SiloInteractionPort, Configuration.GatewayPort, listenOnAnyHostAddress: true)
                 .ConfigureLogging(s => s.SetMinimumLevel(LogLevel.Information).AddFile(Configuration.LogFile))
                 .Build();
 
