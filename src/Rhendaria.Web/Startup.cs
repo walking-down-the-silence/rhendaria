@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Net;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Orleans;
-using Orleans.Configuration;
-using Orleans.Hosting;
-using Orleans.Logging;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -37,7 +30,7 @@ namespace Rhendaria.Web
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddSwaggerGen(ConfigureSwagger);
-            services.AddSingleton(CreateClusteClientInstance);
+            services.AddSingleton(new ClusterClientsFactory(Configuration).CreateInstance());
         }
 
         public void Configure(IApplicationBuilder app, Microsoft.AspNetCore.Hosting.IHostingEnvironment env)
@@ -73,31 +66,6 @@ namespace Rhendaria.Web
         private static void ConfigureSwagger(SwaggerGenOptions options)
         {
             options.SwaggerDoc("v1", new Info { Title = "Rhendaria Api", Version = "v1" });
-        }
-
-        private static IClusterClient CreateClusteClientInstance(IServiceProvider services)
-        {
-            IClientBuilder clientBuilder = new ClientBuilder()
-                .Configure<ClusterOptions>(options =>
-                {
-                    options.ClusterId = "rhendaria-cluster";
-                    options.ServiceId = "rhendaria-game-engine";
-                })
-                .UseAdoNetClustering(options =>
-                {
-                    options.ConnectionString = "User ID=postgres;Password=postgres;Host=localhost;Port=5432;Database=orleans;Pooling=true;";
-                    options.Invariant = "Npgsql";
-                })
-                .ConfigureLogging(builder =>
-                {
-                    builder.SetMinimumLevel(LogLevel.Debug).AddFile("OrleansWebClient.log");
-                });
-
-            IClusterClient client = clientBuilder.Build();
-
-            Task.WaitAll(client.Connect());
-
-            return client;
         }
     }
 }

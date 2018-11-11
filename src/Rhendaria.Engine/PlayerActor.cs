@@ -33,5 +33,17 @@ namespace Rhendaria.Engine
             await WriteStateAsync();
             return result;
         }
+
+        public override Task OnActivateAsync()
+        {
+            if (!State.IsInitialized)
+            {
+                State.Color = "Red";
+                State.Position = new Vector2D(0, 0);
+                State.Size = new Vector2D(1, 1);
+            }
+
+            return Task.CompletedTask;
+        }
     }
 }
