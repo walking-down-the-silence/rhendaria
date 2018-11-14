@@ -1,6 +1,6 @@
 ﻿using Rhendaria.Abstraction;
 
-namespace Rhendaria.Web.DTO
+namespace Rhendaria.Web.Commands
 {
     public class MovementCommand
     {

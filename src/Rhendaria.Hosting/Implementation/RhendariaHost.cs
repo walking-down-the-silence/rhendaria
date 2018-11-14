@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.Logging;
@@ -11,11 +12,11 @@ namespace Rhendaria.Hosting.Implementation
     public class RhendariaHost : IRhendariaHost
     {
         private ISiloHost _silo;
-        public IRhendariaHostConfiguration Configuration { get; }
+        public RhendariaHostConfigurationOptions Configuration { get; }
 
-        public RhendariaHost(IRhendariaHostConfiguration configuration)
+        public RhendariaHost(IOptions<RhendariaHostConfigurationOptions> configuration)
         {
-            Configuration = configuration;
+            Configuration = configuration.Value;
         }
 
         public async Task StartAsync()
@@ -47,7 +48,10 @@ namespace Rhendaria.Hosting.Implementation
                     options.UseJsonFormat = true;
                 })
                 .ConfigureEndpoints(Configuration.SiloInteractionPort, Configuration.GatewayPort, listenOnAnyHostAddress: true)
-                .ConfigureLogging(s => s.SetMinimumLevel(LogLevel.Information).AddFile(Configuration.LogFile))
+                .ConfigureLogging(s =>
+                {
+                    s.SetMinimumLevel(LogLevel.Information).AddFile(Configuration.LogFile);
+                })
                 .Build();
 
             return silo;

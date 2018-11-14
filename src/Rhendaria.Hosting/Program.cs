@@ -2,7 +2,9 @@
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Rhendaria.Hosting.Implementation;
+using Rhendaria.Hosting.Interfaces;
 
 namespace Rhendaria.Hosting
 {
@@ -16,12 +18,19 @@ namespace Rhendaria.Hosting
 
             IConfigurationRoot configuration = builder.Build();
 
+            var serviceProvider = new ServiceCollection()
+                .AddOptions()
+                .AddSingleton<IRhendariaHost, RhendariaHost>()
+                .Configure<RhendariaHostConfigurationOptions>(configuration.GetSection("RhendariaHostConfigurationOption"))
+                .BuildServiceProvider();
+
             await WriteAsync("Rhendaria host starting ......");
 
             try
             {
-                var host = await new RhendariaHostFactory().StartPosgressHostAsync(configuration);
+                var host = serviceProvider.GetService<IRhendariaHost>();
 
+                await host.StartAsync();
                 await WriteLineAsync("[OK]", ConsoleColor.Green);
 
                 await WriteLineAsync("Press any key to stop the host");

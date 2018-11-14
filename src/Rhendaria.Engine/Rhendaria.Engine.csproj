@@ -9,10 +9,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Orleans.Core.Abstractions">
-      <HintPath>..\..\..\..\Users\serhii.trush\.nuget\packages\microsoft.orleans.core.abstractions\2.1.2\lib\netstandard2.0\Orleans.Core.Abstractions.dll</HintPath>
-    </Reference>
-
     <PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="2.1.2" />
     <PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator.Build" Version="2.1.2">
       <PrivateAssets>all</PrivateAssets>

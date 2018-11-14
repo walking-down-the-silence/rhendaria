@@ -2,7 +2,7 @@
 using Orleans;
 using Rhendaria.Abstraction;
 using System.Threading.Tasks;
-using Rhendaria.Web.DTO;
+using Rhendaria.Web.Commands;
 
 namespace Rhendaria.Web.Controllers
 {
