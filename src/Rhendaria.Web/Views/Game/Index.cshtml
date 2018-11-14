@@ -1,4 +1,4 @@
-﻿@model Rhendaria.Web.Models.PlayerStateViewModel
+@model Rhendaria.Web.Models.PlayerStateViewModel
 
 @{
     ViewData["Title"] = "Game View";
@@ -39,7 +39,9 @@
     
 </div>
 
+<script src="~/lib/signalr.min.js"></script>
 <script src="~/js/pixi.min.js"></script>
+<script src="~/js/gameCommunication.js"></script>
 <script src="~/js/game.js"></script>
 
 <script type="text/javascript">
@@ -65,6 +67,8 @@
             success: function (data) { handleSuccess(data); },
             error: function (error) { handleError(error); }
         });
+
+        gameCommunication.invoke('@Model.Username', direction);
     }
 
     function handleSuccess(data) {
