@@ -11,8 +11,9 @@ namespace Rhendaria.Hosting.Implementation
 {
     public class RhendariaHost : IRhendariaHost
     {
-        private ISiloHost _silo;
         public RhendariaHostConfigurationOptions Configuration { get; }
+
+        private ISiloHost _silo;
 
         public RhendariaHost(IOptions<RhendariaHostConfigurationOptions> configuration)
         {
@@ -26,6 +27,15 @@ namespace Rhendaria.Hosting.Implementation
 
             _silo = BuildSilo();
             await _silo.StartAsync();
+        }
+
+        public async Task StopAsync()
+        {
+            if (_silo == null)
+                throw new InvalidOperationException("Host is not started yet");
+
+            await _silo.StopAsync();
+            _silo = null;
         }
 
         private ISiloHost BuildSilo()
@@ -55,15 +65,6 @@ namespace Rhendaria.Hosting.Implementation
                 .Build();
 
             return silo;
-        }
-
-        public async Task StopAsync()
-        {
-            if (_silo == null)
-                throw new InvalidOperationException("Host is not started yet");
-
-            await _silo.StopAsync();
-            _silo = null;
         }
     }
 }

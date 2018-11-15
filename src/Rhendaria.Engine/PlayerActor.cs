@@ -36,7 +36,7 @@ namespace Rhendaria.Engine
 
         public override Task OnActivateAsync()
         {
-            if (!State.IsInitialized)
+            if (!State.IsInitialized())
             {
                 State.Color = "Red";
                 State.Position = new Vector2D(0, 0);

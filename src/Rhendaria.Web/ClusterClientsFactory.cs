@@ -14,7 +14,6 @@ namespace Rhendaria.Web
     {
         private readonly IConfiguration _configuration;
 
-
         public ClusterClientsFactory(IConfiguration configuration)
         {
             _configuration = configuration;

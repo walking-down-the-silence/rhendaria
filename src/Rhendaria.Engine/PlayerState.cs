@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.Serialization;
 using Rhendaria.Abstraction;
 
 namespace Rhendaria.Engine
@@ -9,7 +8,9 @@ namespace Rhendaria.Engine
     {
         public PlayerState()
         {
-            IsInitialized = true;
+            Color = "White";
+            Position = new Vector2D(0, 0);
+            Size = new Vector2D(0, 0);
         }
 
         public string Color { get; set; }
@@ -18,7 +19,12 @@ namespace Rhendaria.Engine
 
         public Vector2D Size { get; set; }
 
-        [IgnoreDataMember]
-        public bool IsInitialized { get; }
+        public bool IsInitialized()
+        {
+            return Color == "White"
+                   && Position.Left == 0 && Position.Top == 0
+                   && Size.Top == 0 && Size.Left == 0;
+        }
+
     }
 }
