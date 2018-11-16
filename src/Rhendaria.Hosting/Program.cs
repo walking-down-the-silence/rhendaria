@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Rhendaria.Abstraction;
 using Rhendaria.Hosting.Implementation;
 using Rhendaria.Hosting.Interfaces;
 
@@ -22,6 +23,7 @@ namespace Rhendaria.Hosting
                 .AddOptions()
                 .AddSingleton<IRhendariaHost, RhendariaHost>()
                 .Configure<RhendariaHostOptions>(configuration.GetSection(nameof(RhendariaHostOptions)))
+                .Configure<ZoneOptions>(configuration.GetSection(nameof(ZoneOptions)))
                 .BuildServiceProvider();
 
             await WriteAsync("Rhendaria host starting ......");

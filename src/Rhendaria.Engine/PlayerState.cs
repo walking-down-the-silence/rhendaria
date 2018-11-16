@@ -8,6 +8,9 @@ namespace Rhendaria.Engine
     {
         public PlayerState()
         {
+            if (IsInitialized())
+                return;
+
             Color = "White";
             Position = new Vector2D(0, 0);
             Size = new Vector2D(0, 0);
@@ -21,10 +24,9 @@ namespace Rhendaria.Engine
 
         public bool IsInitialized()
         {
-            return Color == "White"
+            return !(Color == "White"
                    && Position.Left == 0 && Position.Top == 0
-                   && Size.Top == 0 && Size.Left == 0;
+                   && Size.Top == 0 && Size.Left == 0);
         }
-
     }
 }

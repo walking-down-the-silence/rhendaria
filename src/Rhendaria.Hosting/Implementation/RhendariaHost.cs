@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.Logging;
+using Rhendaria.Abstraction;
 using Rhendaria.Hosting.Interfaces;
 
 namespace Rhendaria.Hosting.Implementation
@@ -12,12 +14,14 @@ namespace Rhendaria.Hosting.Implementation
     public class RhendariaHost : IRhendariaHost
     {
         public RhendariaHostOptions Configuration { get; }
+        public ZoneOptions ZoneOptions { get; }
 
         private ISiloHost _silo;
 
-        public RhendariaHost(IOptions<RhendariaHostOptions> configuration)
+        public RhendariaHost(IOptions<RhendariaHostOptions> hostOptions, IOptions<ZoneOptions> zonOptions)
         {
-            Configuration = configuration.Value;
+            ZoneOptions = zonOptions.Value;
+            Configuration = hostOptions.Value;
         }
 
         public async Task StartAsync()
@@ -57,7 +61,15 @@ namespace Rhendaria.Hosting.Implementation
                     options.Invariant = Configuration.SqlClientInvariant;
                     options.UseJsonFormat = true;
                 })
-                .ConfigureEndpoints(Configuration.SiloInteractionPort, Configuration.GatewayPort, listenOnAnyHostAddress: true)
+                .ConfigureEndpoints(Configuration.SiloInteractionPort, Configuration.GatewayPort,listenOnAnyHostAddress: true)
+                .ConfigureServices(services =>
+                {
+                    services.Configure<ZoneOptions>(options =>
+                    {
+                        options.ZoneHeight = ZoneOptions.ZoneHeight;
+                        options.ZoneWidth = ZoneOptions.ZoneWidth;
+                    });
+                })
                 .ConfigureLogging(s =>
                 {
                     s.SetMinimumLevel(LogLevel.Information).AddFile(Configuration.LogFile);
