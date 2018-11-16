@@ -11,11 +11,11 @@ namespace Rhendaria.Hosting.Implementation
 {
     public class RhendariaHost : IRhendariaHost
     {
-        public RhendariaHostConfigurationOptions Configuration { get; }
+        public RhendariaHostOptions Configuration { get; }
 
         private ISiloHost _silo;
 
-        public RhendariaHost(IOptions<RhendariaHostConfigurationOptions> configuration)
+        public RhendariaHost(IOptions<RhendariaHostOptions> configuration)
         {
             Configuration = configuration.Value;
         }

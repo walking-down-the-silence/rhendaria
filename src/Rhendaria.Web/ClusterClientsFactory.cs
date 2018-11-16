@@ -1,12 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Orleans;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.Logging;
 using Orleans.Runtime;
+using System;
+using System.Threading.Tasks;
 
 namespace Rhendaria.Web
 {
@@ -39,27 +39,24 @@ namespace Rhendaria.Web
 
             IClusterClient client = clientBuilder.Build();
 
-            Task.WaitAll(client.Connect(new RetryState().ShouldRetry));
+            int currentAttempts = 0;
+            int maximumAttempts = 10;
+            Task<bool> RetryFunc(Exception exception) => Retry(currentAttempts++, maximumAttempts, exception);
+
+            Task.WaitAll(client.Connect(RetryFunc));
 
             return client;
         }
 
-        private class RetryState
+        private async Task<bool> Retry(int currentAttempts, int maximumAttempts, Exception exception)
         {
-            short _attempts;
-            const short MaximumAllowedAttempts = 10;
-
-            internal async Task<bool> ShouldRetry(Exception arg)
+            switch (exception)
             {
-                if (arg is SiloUnavailableException)
-                {
-                    _attempts++;
+                case SiloUnavailableException ex:
                     await Task.Delay(TimeSpan.FromSeconds(2));
-                }
-                else
+                    return currentAttempts < maximumAttempts;
+                default:
                     return false;
-
-                return _attempts < MaximumAllowedAttempts;
             }
         }
     }

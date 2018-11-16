@@ -8,7 +8,7 @@ using Rhendaria.Hosting.Interfaces;
 
 namespace Rhendaria.Hosting
 {
-    public class Program
+    public static class Program
     {
         public static async Task Main(string[] args)
         {
@@ -21,7 +21,7 @@ namespace Rhendaria.Hosting
             var serviceProvider = new ServiceCollection()
                 .AddOptions()
                 .AddSingleton<IRhendariaHost, RhendariaHost>()
-                .Configure<RhendariaHostConfigurationOptions>(configuration.GetSection("RhendariaHostConfigurationOption"))
+                .Configure<RhendariaHostOptions>(configuration.GetSection(nameof(RhendariaHostOptions)))
                 .BuildServiceProvider();
 
             await WriteAsync("Rhendaria host starting ......");

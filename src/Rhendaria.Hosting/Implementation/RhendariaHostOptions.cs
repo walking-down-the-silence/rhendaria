@@ -1,6 +1,6 @@
 ﻿namespace Rhendaria.Hosting.Implementation
 {
-    public class RhendariaHostConfigurationOptions
+    public class RhendariaHostOptions
     {
         public string ServiceName { get; set; }
         public string ClusterId { get; set; }
