@@ -2,6 +2,7 @@
 using Orleans;
 using Rhendaria.Abstraction;
 using System.Threading.Tasks;
+using Rhendaria.Web.Commands;
 
 namespace Rhendaria.Web.Controllers
 {
@@ -38,11 +39,6 @@ namespace Rhendaria.Web.Controllers
 
             Vector2D position = await _client.GetGrain<IPlayerActor>(username).Move(command.Direction);
             return Ok(position);
-        }
-
-        public class MovementCommand
-        {
-            public Direction Direction { get; set; }
         }
     }
 }

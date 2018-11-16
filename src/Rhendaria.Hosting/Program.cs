@@ -1,44 +1,65 @@
-﻿using Orleans.Configuration;
-using Orleans.Hosting;
 using System;
 using System.IO;
-using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Rhendaria.Abstraction;
+using Rhendaria.Hosting.Implementation;
+using Rhendaria.Hosting.Interfaces;
 
 namespace Rhendaria.Hosting
 {
-    internal static class Program
+    public static class Program
     {
         public static async Task Main(string[] args)
         {
-            var configBuilder = new ConfigurationBuilder()
+            var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appconfig.json", optional: false);
-            var config = configBuilder.Build();
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 
-            ISiloHostBuilder hostBuilder = new SiloHostBuilder()
-                .UseLocalhostClustering()
-                .Configure<ClusterOptions>(options =>
-                {
-                    options.ClusterId = "rhendaria.server.cluster";
-                    options.ServiceId = "rhendaria.server.service";
-                })
-                .AddMemoryGrainStorageAsDefault()
-                .Configure<EndpointOptions>(options => options.AdvertisedIPAddress = IPAddress.Loopback)
-                .ConfigureServices(services =>
-                {
-                    services.Configure<ZoneOptions>(config.GetSection("ZoneOptions"));
-                });
+            IConfigurationRoot configuration = builder.Build();
 
-            ISiloHost host = hostBuilder.Build();
+            var serviceProvider = new ServiceCollection()
+                .AddOptions()
+                .AddSingleton<IRhendariaHost, RhendariaHost>()
+                .Configure<RhendariaHostOptions>(configuration.GetSection(nameof(RhendariaHostOptions)))
+                .Configure<ZoneOptions>(configuration.GetSection(nameof(ZoneOptions)))
+                .BuildServiceProvider();
 
-            await host.StartAsync();
+            await WriteAsync("Rhendaria host starting ......");
 
-            Console.WriteLine("Press any key to continue and close the server.");
-            Console.ReadKey();
+            try
+            {
+                var host = serviceProvider.GetService<IRhendariaHost>();
+
+                await host.StartAsync();
+                await WriteLineAsync("[OK]", ConsoleColor.Green);
+
+                await WriteLineAsync("Press any key to stop the host");
+                await Console.In.ReadLineAsync();
+
+                await host.StopAsync();
+            }
+            catch (Exception e)
+            {
+                await WriteLineAsync("[Failed]", ConsoleColor.Red);
+                await WriteLineAsync(e.Message);
+
+                await Console.In.ReadLineAsync();
+            }
+        }
+
+        public static async Task WriteAsync(string text, ConsoleColor color = ConsoleColor.White)
+        {
+            var previusColor = Console.ForegroundColor;
+            Console.ForegroundColor = color;
+            await Console.Out.WriteAsync(text);
+            Console.ForegroundColor = previusColor;
+        }
+
+        public static async Task WriteLineAsync(string text, ConsoleColor color = ConsoleColor.White)
+        {
+            await WriteAsync($"{text}{Environment.NewLine}", color);
         }
     }
 }

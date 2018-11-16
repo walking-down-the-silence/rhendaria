@@ -1,6 +1,5 @@
 ﻿using Orleans;
 using Rhendaria.Abstraction;
-using Rhendaria.Hosting;
 using System.Threading.Tasks;
 
 namespace Rhendaria.Engine
@@ -26,22 +25,25 @@ namespace Rhendaria.Engine
             return Task.FromResult(State.Size);
         }
 
-        public Task<Vector2D> Move(Direction direction)
+        public async Task<Vector2D> Move(Direction direction)
         {
             Vector2D result = State.Position.Shift(direction);
             State.Position = result;
-            return Task.FromResult(result);
+
+            await WriteStateAsync();
+            return result;
         }
 
         public override Task OnActivateAsync()
         {
-            if (State != null)
+            if (!State.IsInitialized())
             {
+                State.Color = "Red";
                 State.Position = new Vector2D(0, 0);
-                State.Size = new Vector2D(10, 10);
-                State.Color = "Blue";
+                State.Size = new Vector2D(1, 1);
             }
-            return base.OnActivateAsync();
+
+            return Task.CompletedTask;
         }
     }
 }

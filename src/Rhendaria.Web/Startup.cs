@@ -1,13 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Orleans;
-using Orleans.Configuration;
 using Rhendaria.Web.Hubs;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -34,7 +30,7 @@ namespace Rhendaria.Web
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddSwaggerGen(ConfigureSwagger);
-            services.AddSingleton(CreateClusteClientInstance);
+            services.AddSingleton(new ClusterClientsFactory(Configuration).CreateInstance());
             services.AddSignalR();
         }
 
@@ -76,23 +72,6 @@ namespace Rhendaria.Web
         private static void ConfigureSwagger(SwaggerGenOptions options)
         {
             options.SwaggerDoc("v1", new Info { Title = "Rhendaria Api", Version = "v1" });
-        }
-
-        private static IClusterClient CreateClusteClientInstance(IServiceProvider services)
-        {
-            IClientBuilder clientBuilder = new ClientBuilder()
-                .UseLocalhostClustering()
-                .Configure<ClusterOptions>(options =>
-                {
-                    options.ClusterId = "rhendaria.server.cluster";
-                    options.ServiceId = "rhendaria.server.service";
-                });
-
-            IClusterClient client = clientBuilder.Build();
-
-            Task.WaitAll(client.Connect());
-
-            return client;
         }
     }
 }
