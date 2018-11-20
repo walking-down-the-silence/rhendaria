@@ -1,4 +1,5 @@
-﻿using Orleans;
+﻿using System;
+using Orleans;
 using Rhendaria.Abstraction;
 using System.Threading.Tasks;
 
@@ -20,7 +21,7 @@ namespace Rhendaria.Engine
             return Task.FromResult(State.Position);
         }
 
-        public Task<Vector2D> GetSize()
+        public Task<int> GetSize()
         {
             return Task.FromResult(State.Size);
         }
@@ -40,10 +41,37 @@ namespace Rhendaria.Engine
             {
                 State.Color = "Red";
                 State.Position = new Vector2D(0, 0);
-                State.Size = new Vector2D(1, 1);
+                State.Size = 1;
             }
 
             return Task.CompletedTask;
         }
+
+        public async Task<CollissionCheck> IsCollidedWith(PlayerActor player)
+        {
+            var position = await GetPosition();
+            var targetPosition = await player.GetPosition();
+
+            var dx = position.Left - targetPosition.Left;
+            var dy = position.Top - targetPosition.Top;
+
+            var distance = Math.Sqrt(dx * dx + dy * dy);
+
+            var radius = await GetSize();
+            var tartedRadius = await player.GetSize();
+
+            var isCollided = distance < radius + tartedRadius;
+            return new CollissionCheck
+            {
+                Player = this,
+                IsCollided = isCollided
+            };
+        }
+    }
+
+    public class CollissionCheck
+    {
+        public PlayerActor Player { get; set; }
+        public bool IsCollided { get; set; }
     }
 }

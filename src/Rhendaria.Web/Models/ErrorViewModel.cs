@@ -1,5 +1,3 @@
-using System;
-
 namespace Rhendaria.Web.Models
 {
     public class ErrorViewModel
