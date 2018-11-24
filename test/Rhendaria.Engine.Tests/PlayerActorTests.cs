@@ -3,6 +3,8 @@ using Orleans;
 using Orleans.Hosting;
 using Orleans.TestingHost;
 using Rhendaria.Abstraction;
+using Rhendaria.Abstraction.Actors;
+using Rhendaria.Engine.Actors;
 using Xunit;
 
 namespace Rhendaria.Engine.Tests

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Rhendaria.Abstraction;
+using Rhendaria.Abstraction.Services;
 
-namespace Rhendaria.Engine
+namespace Rhendaria.Engine.Services
 {
     public class EventBus : IEventBus
     {

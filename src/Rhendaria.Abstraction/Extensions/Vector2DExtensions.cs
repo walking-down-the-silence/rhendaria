@@ -1,4 +1,4 @@
-﻿namespace Rhendaria.Abstraction
+﻿namespace Rhendaria.Abstraction.Extensions
 {
     public static class Vector2DExtensions
     {

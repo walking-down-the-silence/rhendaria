@@ -48,15 +48,15 @@ namespace Rhendaria.Web
             return client;
         }
 
-        private async Task<bool> Retry(int currentAttempts, int maximumAttempts, Exception exception)
+        private Task<bool> Retry(int currentAttempts, int maximumAttempts, Exception exception)
         {
             switch (exception)
             {
                 case SiloUnavailableException ex:
-                    await Task.Delay(TimeSpan.FromSeconds(2));
-                    return currentAttempts < maximumAttempts;
+                    Task.Delay(TimeSpan.FromSeconds(2)).Wait();
+                    return Task.FromResult(currentAttempts < maximumAttempts);
                 default:
-                    return false;
+                    return Task.FromResult(false);
             }
         }
     }

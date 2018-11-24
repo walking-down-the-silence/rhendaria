@@ -2,6 +2,7 @@
 using Orleans;
 using Rhendaria.Abstraction;
 using System.Threading.Tasks;
+using Rhendaria.Abstraction.Actors;
 using Rhendaria.Web.Commands;
 
 namespace Rhendaria.Web.Controllers
@@ -37,7 +38,9 @@ namespace Rhendaria.Web.Controllers
                 return BadRequest("Username cannot be null or empty.");
             }
 
-            Vector2D position = await _client.GetGrain<IPlayerActor>(username).Move(command.Direction);
+            var zone = _client.GetGrain<IZoneActor>("zone");
+
+            Vector2D position = await zone.RoutePlayerMovement(username, command.Direction);
             return Ok(position);
         }
     }

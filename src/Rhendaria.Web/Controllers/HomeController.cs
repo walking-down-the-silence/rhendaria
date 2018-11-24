@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Orleans;
 using Rhendaria.Abstraction;
+using Rhendaria.Abstraction.Actors;
 using Rhendaria.Web.Extensions;
 using Rhendaria.Web.Models;
 

@@ -1,9 +1,10 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 using Orleans;
 using Rhendaria.Abstraction;
-using System.Threading.Tasks;
+using Rhendaria.Abstraction.Actors;
+using Rhendaria.Abstraction.Extensions;
 
-namespace Rhendaria.Engine
+namespace Rhendaria.Engine.Actors
 {
     public class PlayerActor : Grain<PlayerState>, IPlayerActor
     {
@@ -43,35 +44,8 @@ namespace Rhendaria.Engine
                 State.Position = new Vector2D(0, 0);
                 State.Size = 1;
             }
-
+      
             return Task.CompletedTask;
         }
-
-        public async Task<CollissionCheck> IsCollidedWith(PlayerActor player)
-        {
-            var position = await GetPosition();
-            var targetPosition = await player.GetPosition();
-
-            var dx = position.Left - targetPosition.Left;
-            var dy = position.Top - targetPosition.Top;
-
-            var distance = Math.Sqrt(dx * dx + dy * dy);
-
-            var radius = await GetSize();
-            var tartedRadius = await player.GetSize();
-
-            var isCollided = distance < radius + tartedRadius;
-            return new CollissionCheck
-            {
-                Player = this,
-                IsCollided = isCollided
-            };
-        }
-    }
-
-    public class CollissionCheck
-    {
-        public PlayerActor Player { get; set; }
-        public bool IsCollided { get; set; }
     }
 }

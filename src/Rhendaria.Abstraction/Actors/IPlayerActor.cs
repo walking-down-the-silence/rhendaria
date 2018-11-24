@@ -1,7 +1,7 @@
-﻿using Orleans;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Orleans;
 
-namespace Rhendaria.Abstraction
+namespace Rhendaria.Abstraction.Actors
 {
     public interface IPlayerActor : IGrainWithStringKey
     {
