@@ -13,19 +13,22 @@ namespace Rhendaria.Engine.Services
         public Task<CollisionResult> DetectCollision(IPlayerActor player, ICollection<IPlayerActor> opponents)
         {
             var collissionChecks = opponents
-                .Select(async opponent => await IsCollidedWith(opponent, player))
+                .Select(opponent => IsCollidedWith(opponent, player))
                 .ToList();
 
+            Task.WhenAll(collissionChecks);
+
             var collided = collissionChecks
-                .Where(x => x.Result.IsCollided)
-                .Select(x => x.Result.Player)
+                .Select(task => task.Result)
+                .Where(x => x.IsCollided)
+                .Select(x => x.Player)
                 .OrderByDescending(async p => await p.GetSize())
                 .ToList();
 
             var result = new CollisionResult
             {
                 Loosers = collided.Skip(1).ToList(),
-                Winner = collided.First()
+                Winner = collided.FirstOrDefault() ?? player
             };
 
             return Task.FromResult(result);

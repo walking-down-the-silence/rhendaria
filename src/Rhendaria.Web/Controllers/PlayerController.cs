@@ -38,9 +38,10 @@ namespace Rhendaria.Web.Controllers
                 return BadRequest("Username cannot be null or empty.");
             }
 
+            var player = _client.GetGrain<IPlayerActor>(username);
             var zone = _client.GetGrain<IZoneActor>("zone");
 
-            Vector2D position = await zone.RoutePlayerMovement(username, command.Direction);
+            Vector2D position = await zone.RoutePlayerMovement(player, command.Direction);
             return Ok(position);
         }
     }

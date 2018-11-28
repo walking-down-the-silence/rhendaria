@@ -40,7 +40,7 @@ namespace Rhendaria.Web
             IClusterClient client = clientBuilder.Build();
 
             int currentAttempts = 0;
-            int maximumAttempts = 10;
+            int maximumAttempts = 20;
             Task<bool> RetryFunc(Exception exception) => Retry(currentAttempts++, maximumAttempts, exception);
 
             Task.WaitAll(client.Connect(RetryFunc));
@@ -48,15 +48,15 @@ namespace Rhendaria.Web
             return client;
         }
 
-        private Task<bool> Retry(int currentAttempts, int maximumAttempts, Exception exception)
+        private async Task<bool> Retry(int currentAttempts, int maximumAttempts, Exception exception)
         {
             switch (exception)
             {
                 case SiloUnavailableException ex:
-                    Task.Delay(TimeSpan.FromSeconds(2)).Wait();
-                    return Task.FromResult(currentAttempts < maximumAttempts);
+                    await Task.Delay(TimeSpan.FromSeconds(2));
+                    return currentAttempts < maximumAttempts;
                 default:
-                    return Task.FromResult(false);
+                    return false;
             }
         }
     }

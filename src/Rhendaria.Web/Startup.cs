@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Rhendaria.Abstraction.Services;
-using Rhendaria.Engine.Services;
 using Rhendaria.Web.Hubs;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -33,10 +31,6 @@ namespace Rhendaria.Web
 
             services.AddSwaggerGen(ConfigureSwagger);
             services.AddSingleton(new ClusterClientsFactory(Configuration).CreateInstance());
-
-            services.AddSingleton<IEventBus, EventBus>();
-            services.AddScoped<IScoreCalculatingService, ScoreCalculationService>();
-            services.AddScoped<ICollisionDetectingService, CollisionDetectingService>();
 
             services.AddSignalR();
         }

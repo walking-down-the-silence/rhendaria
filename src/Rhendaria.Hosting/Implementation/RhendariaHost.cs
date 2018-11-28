@@ -3,10 +3,14 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Orleans.ApplicationParts;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.Logging;
 using Rhendaria.Abstraction;
+using Rhendaria.Abstraction.Services;
+using Rhendaria.Engine.Actors;
+using Rhendaria.Engine.Services;
 using Rhendaria.Hosting.Interfaces;
 
 namespace Rhendaria.Hosting.Implementation
@@ -69,6 +73,10 @@ namespace Rhendaria.Hosting.Implementation
                         options.ZoneHeight = ZoneOptions.ZoneHeight;
                         options.ZoneWidth = ZoneOptions.ZoneWidth;
                     });
+
+                    services.AddSingleton<IEventBus, EventBus>();
+                    services.AddScoped<IScoreCalculatingService, ScoreCalculationService>();
+                    services.AddScoped<ICollisionDetectingService, CollisionDetectingService>();
                 })
                 .ConfigureLogging(s =>
                 {

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Orleans;
 using Rhendaria.Abstraction;
@@ -10,36 +11,32 @@ namespace Rhendaria.Engine.Actors
 {
     public class ZoneActor : Grain<ZoneState>, IZoneActor
     {
-        private readonly IClusterClient _client;
         private readonly ICollisionDetectingService _collisionDetector;
         private readonly IEventBus _eventBus;
         private readonly IScoreCalculatingService _scoreCalculator;
 
-        public ZoneActor(IClusterClient client, ICollisionDetectingService collisionDetector, IEventBus eventBus, IScoreCalculatingService scoreCalculator)
+        public ZoneActor(ICollisionDetectingService collisionDetector, IEventBus eventBus, IScoreCalculatingService scoreCalculator)
         {
-            _client = client;
             _collisionDetector = collisionDetector;
             _eventBus = eventBus;
             _scoreCalculator = scoreCalculator;
         }
 
-        public async Task<Vector2D> RoutePlayerMovement(string username, Direction direction)
+        public async Task<Vector2D> RoutePlayerMovement(IPlayerActor player, Direction direction)
         {
-            var currentlyInZone = State.Players.Contains(username);
+            var playerName = await player.GetUsername();
+            var currentlyInZone = State.Players.ContainsKey(playerName);
 
             if (!currentlyInZone)
             {
-                State.Players.Add(username);
+                State.Players.Add(playerName, player);
                 await WriteStateAsync();
             }
-
-            var player = _client.GetGrain<IPlayerActor>(username);
 
             Vector2D currentPosition = await player.Move(direction);
 
             var opponents = State.Players
-                .ExceptOf(username)
-                .Select(opponentName => _client.GetGrain<IPlayerActor>(opponentName))
+                .ExceptOf(playerName)
                 .ToList();
 
             var collissionResult = await _collisionDetector.DetectCollision(player, opponents);
@@ -53,6 +50,14 @@ namespace Rhendaria.Engine.Actors
             await _eventBus.PublishPlayersScoreIncreasedEvent(winnerName, score);
 
             return currentPosition;
+        }
+
+        public override Task OnActivateAsync()
+        {
+            if (!State.IsInitialized())
+                State.Players = new Dictionary<string, IPlayerActor>();
+
+            return Task.CompletedTask;
         }
     }
 }
