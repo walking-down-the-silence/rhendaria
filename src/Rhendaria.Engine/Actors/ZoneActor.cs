@@ -11,12 +11,14 @@ namespace Rhendaria.Engine.Actors
 {
     public class ZoneActor : Grain<ZoneState>, IZoneActor
     {
+        private readonly IGrainFactory _grainFactory;
         private readonly ICollisionDetectingService _collisionDetector;
         private readonly IEventBus _eventBus;
         private readonly IScoreCalculatingService _scoreCalculator;
 
-        public ZoneActor(ICollisionDetectingService collisionDetector, IEventBus eventBus, IScoreCalculatingService scoreCalculator)
+        public ZoneActor(IGrainFactory grainFactory, ICollisionDetectingService collisionDetector, IEventBus eventBus, IScoreCalculatingService scoreCalculator)
         {
+            _grainFactory = grainFactory;
             _collisionDetector = collisionDetector;
             _eventBus = eventBus;
             _scoreCalculator = scoreCalculator;
@@ -25,11 +27,11 @@ namespace Rhendaria.Engine.Actors
         public async Task<Vector2D> RoutePlayerMovement(IPlayerActor player, Direction direction)
         {
             var playerName = await player.GetUsername();
-            var currentlyInZone = State.Players.ContainsKey(playerName);
+            var currentlyInZone = State.Players.Contains(playerName);
 
             if (!currentlyInZone)
             {
-                State.Players.Add(playerName, player);
+                State.Players.Add(playerName);
                 await WriteStateAsync();
             }
 
@@ -37,6 +39,7 @@ namespace Rhendaria.Engine.Actors
 
             var opponents = State.Players
                 .ExceptOf(playerName)
+                .Select(opponent => _grainFactory.GetGrain<IPlayerActor>(opponent))
                 .ToList();
 
             var collissionResult = await _collisionDetector.DetectCollision(player, opponents);
@@ -55,7 +58,7 @@ namespace Rhendaria.Engine.Actors
         public override Task OnActivateAsync()
         {
             if (!State.IsInitialized())
-                State.Players = new Dictionary<string, IPlayerActor>();
+                State.Players = new HashSet<string>();
 
             return Task.CompletedTask;
         }

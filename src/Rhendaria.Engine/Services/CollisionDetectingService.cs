@@ -10,28 +10,31 @@ namespace Rhendaria.Engine.Services
 {
     public class CollisionDetectingService : ICollisionDetectingService
     {
-        public Task<CollisionResult> DetectCollision(IPlayerActor player, ICollection<IPlayerActor> opponents)
+        public async Task<CollisionResult> DetectCollision(IPlayerActor player, ICollection<IPlayerActor> opponents)
         {
             var collissionChecks = opponents
-                .Select(opponent => IsCollidedWith(opponent, player))
+                .Select(opponent => IsCollidedWith(player, opponent))
                 .ToList();
 
-            Task.WhenAll(collissionChecks);
-
-            var collided = collissionChecks
-                .Select(task => task.Result)
+            var collided = (await Task.WhenAll(collissionChecks))
                 .Where(x => x.IsCollided)
                 .Select(x => x.Player)
-                .OrderByDescending(async p => await p.GetSize())
+                .ToList();;
+
+            var ordered = (await Task.WhenAll(collided
+                    .Select(async target => new {Size = await target.GetSize(), Target = target})))
+                .Union(new[] {new {Size = await player.GetSize(), Target = player}})
+                .OrderByDescending(x => x.Size)
+                .Select(x => x.Target)
                 .ToList();
 
             var result = new CollisionResult
             {
-                Loosers = collided.Skip(1).ToList(),
-                Winner = collided.FirstOrDefault() ?? player
+                Loosers = ordered.Skip(1).ToList(),
+                Winner = ordered.FirstOrDefault() ?? player
             };
 
-            return Task.FromResult(result);
+            return result;
         }
 
         private class CollissionCheck
@@ -55,7 +58,7 @@ namespace Rhendaria.Engine.Services
 
             return new CollissionCheck
             {
-                Player = player,
+                Player = targetPlayer,
                 IsCollided = distance < radius + tartedRadius
             };
         }
