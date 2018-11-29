@@ -12,26 +12,23 @@ namespace Rhendaria.Engine.Services
     {
         public async Task<CollisionResult> DetectCollision(IPlayerActor player, ICollection<IPlayerActor> opponents)
         {
-            var collissionChecks = opponents
-                .Select(opponent => IsCollidedWith(player, opponent))
-                .ToList();
+            var collissionChecks = await Task.WhenAll(opponents
+                .Select(opponent => IsCollidedWith(player, opponent)));
 
-            var collided = (await Task.WhenAll(collissionChecks))
+            var targets = collissionChecks
                 .Where(x => x.IsCollided)
-                .Select(x => x.Player)
-                .ToList();;
+                .Select(x => x.Target);
 
-            var ordered = (await Task.WhenAll(collided
-                    .Select(async target => new {Size = await target.GetSize(), Target = target})))
-                .Union(new[] {new {Size = await player.GetSize(), Target = player}})
+            var orderedPlayers = (await Task.WhenAll(targets.Append(player)
+                .Select(async target => new { Size = await target.GetSize(), Target = target })))
                 .OrderByDescending(x => x.Size)
                 .Select(x => x.Target)
                 .ToList();
 
             var result = new CollisionResult
             {
-                Loosers = ordered.Skip(1).ToList(),
-                Winner = ordered.FirstOrDefault() ?? player
+                Loosers = orderedPlayers.Skip(1).ToList(),
+                Winner = orderedPlayers.FirstOrDefault() ?? player
             };
 
             return result;
@@ -39,7 +36,7 @@ namespace Rhendaria.Engine.Services
 
         private class CollissionCheck
         {
-            public IPlayerActor Player { get; set; }
+            public IPlayerActor Target { get; set; }
             public bool IsCollided { get; set; }
         }
 
@@ -58,7 +55,7 @@ namespace Rhendaria.Engine.Services
 
             return new CollissionCheck
             {
-                Player = targetPlayer,
+                Target = targetPlayer,
                 IsCollided = distance < radius + tartedRadius
             };
         }

@@ -43,7 +43,7 @@ namespace Rhendaria.Engine.Actors
             {
                 State.Color = "Red";
                 State.Position = new Vector2D(0, 0);
-                State.Size = 1;
+                State.Size = 3;
             }
       
             return Task.CompletedTask;
