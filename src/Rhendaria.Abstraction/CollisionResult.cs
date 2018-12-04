@@ -7,5 +7,7 @@ namespace Rhendaria.Abstraction
     {
         public ICollection<IPlayerActor> Loosers { get; set; }
         public IPlayerActor Winner { get; set; }
+
+        public bool HasValue() => Winner != null;
     }
 }

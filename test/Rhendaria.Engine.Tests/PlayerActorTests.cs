@@ -4,7 +4,6 @@ using Orleans.Hosting;
 using Orleans.TestingHost;
 using Rhendaria.Abstraction;
 using Rhendaria.Abstraction.Actors;
-using Rhendaria.Engine.Actors;
 using Xunit;
 
 namespace Rhendaria.Engine.Tests
@@ -37,15 +36,20 @@ namespace Rhendaria.Engine.Tests
         public void MoveRight_ReturnResultEqualsActualPosition()
         {
             // Arrange
-            IPlayerActor player = new PlayerActor();
+            TestClusterBuilder builder = new TestClusterBuilder(1);
+            builder.AddSiloBuilderConfigurator<TestSiloBuilderConfigurator>();
+            builder.AddClientBuilderConfigurator<TestClientBuilderConfigurator>();
+            TestCluster cluster = builder.Build();
 
             // Act
-            var result = player.Move(Direction.Right);
-            var actual = player.GetPosition();
+            cluster.Deploy();
+            var player = cluster.GrainFactory.GetGrain<IPlayerActor>("test.user");
+            var result = player.Move(Direction.Right).Result;
+            var actual = player.GetPosition().Result;
 
             // Assert
-            Assert.Equal(result.Result.Left, actual.Result.Left);
-            Assert.Equal(result.Result.Top, actual.Result.Top);
+            Assert.Equal(result.Left, actual.Left);
+            Assert.Equal(result.Top, actual.Top);
         }
 
         private class TestSiloBuilderConfigurator : ISiloBuilderConfigurator

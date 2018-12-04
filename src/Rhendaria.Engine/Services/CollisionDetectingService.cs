@@ -15,20 +15,32 @@ namespace Rhendaria.Engine.Services
             var collissionChecks = await Task.WhenAll(opponents
                 .Select(opponent => IsCollidedWith(player, opponent)));
 
-            var targets = collissionChecks
+            var collided = collissionChecks
                 .Where(x => x.IsCollided)
                 .Select(x => x.Target);
 
-            var orderedPlayers = (await Task.WhenAll(targets.Append(player)
-                .Select(async target => new { Size = await target.GetSize(), Target = target })))
-                .OrderByDescending(x => x.Size)
-                .Select(x => x.Target)
+            var sortedDictionary = new SortedDictionary<int, List<IPlayerActor>>();
+            foreach (var grain in collided.Append(player))
+            {
+                var size = await grain.GetSize();
+
+                if (!sortedDictionary.ContainsKey(size))
+                    sortedDictionary.Add(size, new List<IPlayerActor>());
+
+                sortedDictionary[size].Add(grain);
+            }
+
+            var loosers = sortedDictionary
+                .Take(sortedDictionary.Count - 1)
+                .SelectMany(k => k.Value)
                 .ToList();
+
+            var winner = sortedDictionary.Count > 1 ? sortedDictionary.Last().Value.Last() : null;
 
             var result = new CollisionResult
             {
-                Loosers = orderedPlayers.Skip(1).ToList(),
-                Winner = orderedPlayers.FirstOrDefault() ?? player
+                Loosers = loosers,
+                Winner = winner,
             };
 
             return result;

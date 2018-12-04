@@ -55,7 +55,7 @@ namespace Rhendaria.Engine.Actors
 
             var collissionResult = await _collisionDetector.DetectCollision(currentPlayer, opponents);
 
-            if (collissionResult.Loosers.Count == 0)
+            if (!collissionResult.HasValue())
                 return;
 
             var score = await _scoreCalculator.CalculateScore(collissionResult.Winner, collissionResult.Loosers);
