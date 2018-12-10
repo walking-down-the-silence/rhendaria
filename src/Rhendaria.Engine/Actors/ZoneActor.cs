@@ -16,7 +16,10 @@ namespace Rhendaria.Engine.Actors
         private readonly IEventBus _eventBus;
         private readonly IScoreCalculatingService _scoreCalculator;
 
-        public ZoneActor(IGrainFactory grainFactory, ICollisionDetectingService collisionDetector, IScoreCalculatingService scoreCalculator, IEventBus eventBus)
+        public ZoneActor(IGrainFactory grainFactory,
+            ICollisionDetectingService collisionDetector,
+            IScoreCalculatingService scoreCalculator,
+            IEventBus eventBus)
         {
             _grainFactory = grainFactory;
             _collisionDetector = collisionDetector;
@@ -24,15 +27,11 @@ namespace Rhendaria.Engine.Actors
             _scoreCalculator = scoreCalculator;
         }
 
-        public async Task<Vector2D> RoutePlayerMovement(IPlayerActor player, Direction direction)
+        public async Task RoutePlayerMovement(IPlayerActor player)
         {
             await RegisterPlayerIfRequired(player);
 
-            Vector2D currentPosition = await player.Move(direction);
-
             await HandleColissionsAsync(player);
-
-            return currentPosition;
         }
 
         private async Task RegisterPlayerIfRequired(IPlayerActor player)
@@ -49,18 +48,20 @@ namespace Rhendaria.Engine.Actors
 
         private async Task HandleColissionsAsync(IPlayerActor currentPlayer)
         {
-            var opponents = State.Players.ExceptOf(await currentPlayer.GetUsername())
+            var player = await currentPlayer.GetUsername();
+            var opponents = State.Players.ExceptOf(player)
                 .Select(opponent => _grainFactory.GetGrain<IPlayerActor>(opponent))
                 .ToList();
 
             var collissionResult = await _collisionDetector.DetectCollision(currentPlayer, opponents);
 
-            if (!collissionResult.HasValue())
+            if (collissionResult.IsEmpty())
                 return;
 
             var score = await _scoreCalculator.CalculateScore(collissionResult.Winner, collissionResult.Loosers);
 
-            await _eventBus.PublishPlayersScoreIncreasedEvent(await collissionResult.Winner.GetUsername(), score);
+            var winner = await collissionResult.Winner.GetUsername();
+            await _eventBus.PublishPlayersScoreIncreasedEvent(winner, score);
 
             foreach (var looser in collissionResult.Loosers)
             {

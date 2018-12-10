@@ -34,7 +34,7 @@ namespace Rhendaria.Engine.Tests
             var actualLooserName = result.Loosers.First().GetUsername().Result;
 
             //Assert
-            Assert.True(result.HasValue());
+            Assert.False(result.IsEmpty());
             Assert.Equal(expectedWinnerName, actualWinnerName);
             Assert.Equal(new[] {expectedLooserName}, new[] {actualLooserName});
         }
@@ -71,7 +71,7 @@ namespace Rhendaria.Engine.Tests
             var actualLooser2Name = result.Loosers.Last().GetUsername().Result;
 
             //Assert
-            Assert.True(result.HasValue());
+            Assert.False(result.IsEmpty());
             Assert.Equal(expectedWinnerName, actualWinnerName);
             Assert.Equal(
                 new[] {expectedLooser1Name, expectedLooser2Name}.OrderBy(x => x),
@@ -99,7 +99,7 @@ namespace Rhendaria.Engine.Tests
             CollisionResult result = detector.DetectCollision(expectedWinner, new[] { expectedLooser }).Result;
 
             //Assert
-            Assert.False(result.HasValue());
+            Assert.True(result.IsEmpty());
         }
 
         [Fact]
@@ -122,7 +122,7 @@ namespace Rhendaria.Engine.Tests
             CollisionResult result = detector.DetectCollision(expectedWinner, new[] { expectedLooser }).Result;
 
             //Assert
-            Assert.False(result.HasValue());
+            Assert.True(result.IsEmpty());
         }
     }
 }

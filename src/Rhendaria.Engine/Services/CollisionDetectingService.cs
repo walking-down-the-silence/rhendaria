@@ -35,7 +35,7 @@ namespace Rhendaria.Engine.Services
                 .SelectMany(k => k.Value)
                 .ToList();
 
-            var winner = sortedDictionary.Count > 1 ? sortedDictionary.Last().Value.Last() : null;
+            var winner = sortedDictionary.Count > 1 ? sortedDictionary.LastOrDefault().Value?.LastOrDefault() : null;
 
             var result = new CollisionResult
             {

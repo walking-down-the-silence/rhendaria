@@ -41,7 +41,10 @@ namespace Rhendaria.Web.Controllers
             var player = _client.GetGrain<IPlayerActor>(username);
             var zone = _client.GetGrain<IZoneActor>("zone");
 
-            Vector2D position = await zone.RoutePlayerMovement(player, command.Direction);
+            Vector2D position = await player.Move(command.Direction);
+
+            Task.Run(() => zone.RoutePlayerMovement(player));
+
             return Ok(position);
         }
     }

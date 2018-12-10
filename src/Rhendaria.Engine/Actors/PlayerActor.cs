@@ -22,10 +22,9 @@ namespace Rhendaria.Engine.Actors
             return Task.FromResult(State.Position);
         }
 
-        public async Task<int> GetSize()
+        public Task<int> GetSize()
         {
-            await Task.Yield();
-            return State.Size;
+            return Task.FromResult(State.Size);
         }
 
         public async Task<Vector2D> Move(Direction direction)
