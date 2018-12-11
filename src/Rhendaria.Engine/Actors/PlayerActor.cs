@@ -1,8 +1,10 @@
-﻿using Orleans;
+﻿using System.Threading.Tasks;
+using Orleans;
 using Rhendaria.Abstraction;
-using System.Threading.Tasks;
+using Rhendaria.Abstraction.Actors;
+using Rhendaria.Abstraction.Extensions;
 
-namespace Rhendaria.Engine
+namespace Rhendaria.Engine.Actors
 {
     public class PlayerActor : Grain<PlayerState>, IPlayerActor
     {
@@ -20,7 +22,7 @@ namespace Rhendaria.Engine
             return Task.FromResult(State.Position);
         }
 
-        public Task<Vector2D> GetSize()
+        public Task<int> GetSize()
         {
             return Task.FromResult(State.Size);
         }
@@ -40,9 +42,9 @@ namespace Rhendaria.Engine
             {
                 State.Color = "Red";
                 State.Position = new Vector2D(0, 0);
-                State.Size = new Vector2D(1, 1);
+                State.Size = 3;
             }
-
+      
             return Task.CompletedTask;
         }
     }

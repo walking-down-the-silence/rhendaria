@@ -40,7 +40,7 @@ namespace Rhendaria.Web
             IClusterClient client = clientBuilder.Build();
 
             int currentAttempts = 0;
-            int maximumAttempts = 10;
+            int maximumAttempts = 20;
             Task<bool> RetryFunc(Exception exception) => Retry(currentAttempts++, maximumAttempts, exception);
 
             Task.WaitAll(client.Connect(RetryFunc));

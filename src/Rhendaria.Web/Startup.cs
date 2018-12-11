@@ -31,6 +31,7 @@ namespace Rhendaria.Web
 
             services.AddSwaggerGen(ConfigureSwagger);
             services.AddSingleton(new ClusterClientsFactory(Configuration).CreateInstance());
+
             services.AddSignalR();
         }
 

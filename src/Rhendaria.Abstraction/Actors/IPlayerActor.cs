@@ -1,7 +1,7 @@
-﻿using Orleans;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Orleans;
 
-namespace Rhendaria.Abstraction
+namespace Rhendaria.Abstraction.Actors
 {
     public interface IPlayerActor : IGrainWithStringKey
     {
@@ -9,7 +9,7 @@ namespace Rhendaria.Abstraction
 
         Task<Vector2D> GetPosition();
 
-        Task<Vector2D> GetSize();
+        Task<int> GetSize();
 
         Task<Vector2D> Move(Direction direction);
     }
