@@ -1,20 +1,20 @@
 ﻿window.gameCommunication = (function() {
     let connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
 
-
-    connection.on("ReceiveMessage", function (user, message) {
-        console.log(user + ':' + 'message');
-    });
-
     connection.start().catch(function (err) {
         return console.error(err.toString());
     });
 
-    function invoke(user,message) {
-        connection.invoke("SendMessage", user, message).catch(err => console.error(err));
+    function move(user, direction) {
+        connection.invoke("Move", user, direction).catch(err => console.error(err));
+    }
+
+    function setOnMove(callback) {
+        connection.on("OnMove",callback);
     }
 
     return {
-        invoke
+        move,
+        setOnMove
     };
 })();

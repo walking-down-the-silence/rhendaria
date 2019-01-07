@@ -29,23 +29,5 @@ namespace Rhendaria.Web.Controllers
             Vector2D position = await _client.GetGrain<IPlayerActor>(username).GetPosition();
             return Ok(position);
         }
-
-        [HttpPost("move")]
-        public async Task<IActionResult> MovePlayer(string username, [FromBody] MovementCommand command)
-        {
-            if (string.IsNullOrWhiteSpace(username))
-            {
-                return BadRequest("Username cannot be null or empty.");
-            }
-
-            var player = _client.GetGrain<IPlayerActor>(username);
-            var zone = _client.GetGrain<IZoneActor>("zone");
-
-            Vector2D position = await player.Move(command.Direction);
-
-            Task.Run(() => zone.RoutePlayerMovement(player));
-
-            return Ok(position);
-        }
     }
 }

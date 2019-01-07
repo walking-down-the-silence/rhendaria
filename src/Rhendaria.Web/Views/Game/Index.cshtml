@@ -58,26 +58,13 @@
         }
     };
 
-    function move(direction) {
-        $.ajax({
-            url: '@string.Format("api/player/{0}/move", Model.Username)',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ Direction: direction }),
-            success: function (data) { handleSuccess(data); },
-            error: function (error) { handleError(error); }
-        });
-
-        gameCommunication.invoke('@Model.Username', direction);
-    }
-
-    function handleSuccess(data) {
+    gameCommunication.setOnMove((data) => {
         console.log(data);
         document.getElementById('player.position.x').innerText = data.left;
         document.getElementById('player.position.y').innerText = data.top;
-    }
+    });
 
-    function handleError(error) {
-        console.log(error);
-    }
+    function move(direction) {
+        gameCommunication.move('@Model.Username', direction);
+    }    
 </script>
