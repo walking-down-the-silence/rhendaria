@@ -1,4 +1,4 @@
-﻿window.gameCommunication = (function() {
+﻿window.gameCommunication = (function () {
     let connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
 
 
@@ -10,7 +10,7 @@
         return console.error(err.toString());
     });
 
-    function invoke(user,message) {
+    function invoke(user, message) {
         connection.invoke("SendMessage", user, message).catch(err => console.error(err));
     }
 

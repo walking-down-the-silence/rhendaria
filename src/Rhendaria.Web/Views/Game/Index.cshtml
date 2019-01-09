@@ -6,78 +6,19 @@
 
 <h2>View</h2>
 
-<div>
-    <h4>PlayerStateViewModel</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Username)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Username)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.PlayerPositionX)
-        </dt>
-        <dd>
-            <div id="player.position.x">
-                @Html.DisplayFor(model => model.PlayerPositionX)
-            </div>
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.PlayerPositionY)
-        </dt>
-        <dd>
-            <div id="player.position.y">
-                @Html.DisplayFor(model => model.PlayerPositionY)
-            </div>
-        </dd>
-    </dl>
+<div class="center" id="game-field">
+
 </div>
 
-<div id="game-field">
-    
-</div>
+<environment include="Development">
+    <script src="~/js/pixi.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+</environment>
+<environment exclude="Development">
+    <script src="~/js/pixi.min.js"></script>
+    <script src="~/js/site.min.js" asp-append-version="true"></script>
+</environment>
 
 <script src="~/lib/signalr.min.js"></script>
-<script src="~/js/pixi.min.js"></script>
 <script src="~/js/gameCommunication.js"></script>
 <script src="~/js/game.js"></script>
-
-<script type="text/javascript">
-    window.onkeydown = function (e) {
-        var code = e.keyCode ? e.keyCode : e.which;
-        if (code === 37) {
-            move('Left');
-        } else if (code === 38) {
-            move('Up');
-        } else if (code === 39) {
-            move('Right');
-        } else if (code === 40) {
-            move('Down');
-        }
-    };
-
-    function move(direction) {
-        $.ajax({
-            url: '@string.Format("api/player/{0}/move", Model.Username)',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ Direction: direction }),
-            success: function (data) { handleSuccess(data); },
-            error: function (error) { handleError(error); }
-        });
-
-        gameCommunication.invoke('@Model.Username', direction);
-    }
-
-    function handleSuccess(data) {
-        console.log(data);
-        document.getElementById('player.position.x').innerText = data.left;
-        document.getElementById('player.position.y').innerText = data.top;
-    }
-
-    function handleError(error) {
-        console.log(error);
-    }
-</script>
