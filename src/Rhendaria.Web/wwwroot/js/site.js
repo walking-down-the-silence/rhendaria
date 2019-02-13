@@ -6,15 +6,17 @@ window.app = (function () {
         resolution: devicePixelRatio
     });
 
+    const container = document.getElementById("game-field");
+
     app.stage.interactive = true;
-    app.renderer.resize(window.innerWidth, window.innerHeight);
+    console.log(`${container.offsetWidth}, ${container.offsetHeight}`);
+    app.renderer.resize(container.clientWidth, container.clientHeight);
     app.view.addEventListener("mousemove", e => {
         // TODO: get relative coordinates
         window.mouse.position = new Offset(e.clientX, e.clientY);
     });
 
-    document.getElementById("game-field")
-        .appendChild(app.view);
+    container.appendChild(app.view);
 
     return app;
 })();

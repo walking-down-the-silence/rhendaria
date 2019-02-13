@@ -1,5 +1,12 @@
 ﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification\ 
 for details on configuring this project to bundle and minify static web assets. */
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
 body {
     padding-top: 50px;
     padding-bottom: 20px;
@@ -7,11 +14,27 @@ body {
     padding: 0px;
 }
 
+/*page wrapping to make it flex compatible*/
+.page-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.rhendaria-main-nav {
+    margin-bottom: 0px;
+}
+
 /* Wrapping element */
 /* Set some basic padding to keep content from hitting the edges */
 .body-content {
+    margin-top: 8px;
     padding-left: 15px;
     padding-right: 15px;
+    min-height: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Carousel */
@@ -28,6 +51,12 @@ body {
 /* QR code generator */
 #qrCode {
     margin: 15px;
+}
+
+#game-field {
+    flex: 1;
+    margin-bottom: 8px;
+    display: flex;
 }
 
 /* Hide/rearrange for smaller screens */
