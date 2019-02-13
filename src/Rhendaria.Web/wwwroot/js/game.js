@@ -32,6 +32,10 @@ class Offset {
     }
 
     getDirection(targetPosition) {
+        if (targetPosition == undefined) {
+            return new Direction(this._x, this._y);
+        } 
+
         const xDiff = targetPosition.x - this._x;
         const yDiff = targetPosition.y - this._y;
         return new Direction(xDiff, yDiff);
@@ -39,12 +43,16 @@ class Offset {
 }
 
 class Player {
-    constructor(username, position) {
+    constructor(username, position, color) {
+        if (color === undefined) {
+            color = 0xFFBB0B;
+        }
+
         this._username = username;
 
         const circle = new PIXI.Graphics();
 
-        circle.beginFill(0xFFBB0B, 1);
+        circle.beginFill(color, 1);
         circle.drawCircle(position.x, position.y, 50);
         circle.endFill();
 
@@ -62,8 +70,8 @@ class Player {
     move(target) {
         const velocity = 1;
         const current = this.position;
-        const direction = current.getDirection(target);
-
+        const direction = target.getDirection();
+        
         this._sprite.x = this._sprite.x + velocity * direction.x;
         this._sprite.y = this._sprite.y + velocity * direction.y;
     }

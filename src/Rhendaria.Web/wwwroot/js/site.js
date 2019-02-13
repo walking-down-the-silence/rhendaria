@@ -1,4 +1,20 @@
 ﻿// set up the stage element
+window.gameOptions = {
+    fullWidth: 0,
+    fullHeight: 0
+};
+
+Object.defineProperty(window.gameOptions,
+    "centerX",
+    {
+        get: () => window.gameOptions.fullWidth / 2
+    });
+Object.defineProperty(window.gameOptions,
+    "centerY",
+    {
+        get: () => window.gameOptions.fullHeight / 2
+    });
+
 window.app = (function () {
     const app = new PIXI.Application({
         antialias: true,
@@ -6,14 +22,18 @@ window.app = (function () {
         resolution: devicePixelRatio
     });
 
+    const gameOptions = window.gameOptions;
     const container = document.getElementById("game-field");
 
     app.stage.interactive = true;
-    console.log(`${container.offsetWidth}, ${container.offsetHeight}`);
-    app.renderer.resize(container.clientWidth, container.clientHeight);
+    
+    gameOptions.fullWidth = container.offsetWidth;
+    gameOptions.fullHeight = container.offsetHeight;
+
+    app.renderer.resize(gameOptions.fullWidth, gameOptions.fullHeight);
     app.view.addEventListener("mousemove", e => {
         // TODO: get relative coordinates
-        window.mouse.position = new Offset(e.clientX, e.clientY);
+        window.mouse.position = new Offset(e.clientX - container.offsetLeft, e.clientY - container.offsetTop);
     });
 
     container.appendChild(app.view);
@@ -23,13 +43,16 @@ window.app = (function () {
 
 // set up a sprite for player in form of a circle
 window.game = (function () {
+    const gameOptions = window.gameOptions;
+    const positionFactory = () => createRandomPosition(gameOptions.fullWidth, gameOptions.fullHeight);
+
     const state = {
-        player: new Player("justmegaara", new Offset(window.innerWidth / 2, window.innerHeight / 2)),
+        player: new Player("justmegaara", new Offset(gameOptions.centerX, gameOptions.centerY)),
         sprites: [
-            new Player("test player 1", createRandomPosition(window.innerWidth, window.innerHeight)),
-            new Player("test player 2", createRandomPosition(window.innerWidth, window.innerHeight)),
-            new Player("test player 3", createRandomPosition(window.innerWidth, window.innerHeight)),
-            new Player("test player 4", createRandomPosition(window.innerWidth, window.innerHeight))
+            new Player("test player 1", positionFactory(), 0xFF0000),
+            //new Player("test player 2", positionFactory()),
+            //new Player("test player 3", positionFactory()),
+            //new Player("test player 4", positionFactory())
         ]
     };
 
@@ -42,7 +65,7 @@ window.game = (function () {
 
 window.mouse = {
     position: new Offset(0, 0)
-}
+};
 
 // event subscriptions
 window.addEventListener("resize", () => {
@@ -50,9 +73,11 @@ window.addEventListener("resize", () => {
 });
 
 function moveWorldRelativeToPlayer() {
+    const target = new Offset(window.mouse.position._x - window.gameOptions.centerX,
+    window.mouse.position._y - window.gameOptions.centerY);
+    const negative = target.negate();
+    //console.log(negative);
     window.game.sprites.forEach(player => {
-        const target = window.mouse.position;
-        const negative = target.negate();
         player.move(negative);
     });
 }
