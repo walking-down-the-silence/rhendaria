@@ -22,6 +22,7 @@
     <PackageReference Include="Microsoft.Orleans.Server" Version="2.1.2" />
     <PackageReference Include="MySql.Data" Version="8.0.12" />
     <PackageReference Include="Npgsql" Version="4.0.3" />
+    <PackageReference Include="OrleansDashboard" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>

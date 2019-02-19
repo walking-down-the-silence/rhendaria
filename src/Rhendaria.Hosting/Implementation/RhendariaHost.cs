@@ -3,11 +3,13 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Orleans;
 using Orleans.ApplicationParts;
 using Orleans.Configuration;
 using Orleans.Hosting;
 using Orleans.Logging;
 using Rhendaria.Abstraction;
+using Rhendaria.Abstraction.Actors;
 using Rhendaria.Abstraction.Services;
 using Rhendaria.Engine.Actors;
 using Rhendaria.Engine.Services;
@@ -49,6 +51,7 @@ namespace Rhendaria.Hosting.Implementation
         private ISiloHost BuildSilo()
         {
             var silo = new SiloHostBuilder()
+                .UseDashboard()
                 .Configure<ClusterOptions>(options =>
                 {
                     options.ClusterId = Configuration.ClusterId;
@@ -81,6 +84,12 @@ namespace Rhendaria.Hosting.Implementation
                 .ConfigureLogging(s =>
                 {
                     s.SetMinimumLevel(LogLevel.Information).AddFile(Configuration.LogFile);
+                })
+                .ConfigureApplicationParts(appParts =>
+                {
+                    appParts
+                        .AddApplicationPart(typeof(IPlayerActor).Assembly)
+                        .AddApplicationPart(typeof(PlayerActor).Assembly);
                 })
                 .Build();
 
