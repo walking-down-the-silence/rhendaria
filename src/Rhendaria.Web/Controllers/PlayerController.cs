@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Orleans;
 using Rhendaria.Abstraction;
-using System.Threading.Tasks;
 using Rhendaria.Abstraction.Actors;
 using Rhendaria.Web.Commands;
+using System.Threading.Tasks;
 
 namespace Rhendaria.Web.Controllers
 {
@@ -42,8 +42,7 @@ namespace Rhendaria.Web.Controllers
             var zone = _client.GetGrain<IZoneActor>("zone");
 
             Vector2D position = await player.Move(command.Direction);
-
-            Task.Run(() => zone.RoutePlayerMovement(player));
+            await zone.RoutePlayerMovement(player);
 
             return Ok(position);
         }
