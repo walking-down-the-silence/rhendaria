@@ -9,14 +9,14 @@
     }
 
     add(vector: Vector) {
-        let x = vector.x + this.x;
-        let y = vector.y + this.y;
+        let x = this.x + vector.x;
+        let y = this.y + vector.y;
         return new Vector(x, y);
     }
 
     subtract(vector: Vector) {
-        let x = vector.x - this.x;
-        let y = vector.y - this.y;
+        let x = this.x - vector.x;
+        let y = this.y - vector.y;
         return new Vector(x, y);
     }
 
@@ -60,7 +60,8 @@ class Viewport {
         public readonly size: Vector) {
     }
 
-    static create(size: Vector) {
+    static create(width: number, height: number) {
+        let size = Vector.create(width, height);
         return new Viewport(size);
     }
 
@@ -82,23 +83,40 @@ class Sprite {
     }
 }
 
-class Player {
+class User {
     private constructor(
         public readonly nickname: string,
         public readonly sprite: Sprite) {
     }
 
     static create(nickname: string, position: Vector) {
-        return new Player(nickname, Sprite.create(position));
+        return new User(nickname, Sprite.create(position));
     }
 
     translate(zone: Zone, viewport: Viewport) {
         let playerToScreenOffset = viewport.getOffsetRelativeTo(zone, this.sprite.position);
-        return (player: Player) => {
+        console.log(playerToScreenOffset);
+        return (player: User) => {
             let position = player.sprite.position
                 .subtract(zone.box.topLeft)
                 .subtract(playerToScreenOffset);
-            return Player.create(player.nickname, position);
+            return User.create(player.nickname, position);
         }
     }
 }
+
+(function () {
+    var zone = Zone.create(Vector.create(12, 8), Vector.create(24, 16));
+    var viewport = Viewport.create(12, 8);
+    var players = [
+        User.create("player1", Vector.create(16, 11)),
+        User.create("player2", Vector.create(18, 9)),
+        User.create("player3", Vector.create(11, 11)),
+        User.create("player4", Vector.create(18, 18))
+    ];
+    console.log(players);
+    let main = players[0];
+    let translateRelativeTo = main.translate(zone, viewport);
+    let tranlated = players.map(player => translateRelativeTo(player));
+    console.log(tranlated);
+})();
