@@ -75,48 +75,76 @@ class Viewport {
 
 class Sprite {
     private constructor(
+        public readonly nickname: string,
+        public readonly color: string,
         public readonly position: Vector) {
     }
 
-    static create(position: Vector) {
-        return new Sprite(position);
+    static create(nickname: string, position: Vector) {
+        return new Sprite(nickname, "", position);
+    }
+
+    setPosition(position: Vector) {
+        return new Sprite(this.nickname, this.color, position);
     }
 }
 
-class User {
+class Player {
     private constructor(
-        public readonly nickname: string,
         public readonly sprite: Sprite) {
     }
 
-    static create(nickname: string, position: Vector) {
-        return new User(nickname, Sprite.create(position));
+    static create(sprite: Sprite) {
+        return new Player(sprite);
     }
 
     translate(zone: Zone, viewport: Viewport) {
         let playerToScreenOffset = viewport.getOffsetRelativeTo(zone, this.sprite.position);
         console.log(playerToScreenOffset);
-        return (player: User) => {
-            let position = player.sprite.position
+        return (sprite: Sprite) => {
+            let position = sprite.position
                 .subtract(zone.box.topLeft)
                 .subtract(playerToScreenOffset);
-            return User.create(player.nickname, position);
+            return Sprite.create(sprite.nickname, position);
         }
+    }
+}
+
+class Game {
+    private constructor(
+        public readonly zone: Zone,
+        public readonly viewport: Viewport,
+        public readonly player: Player,
+        public readonly sprites: Sprite[]) {
+    }
+
+    static create(zone: Zone, viewport: Viewport, player: Player, sprites: Sprite[]) {
+        return new Game(zone, viewport, player, sprites);
+    }
+
+    updatePosition(nickname: string, position: Vector) {
+        let translateRelativeTo = this.player.translate(this.zone, this.viewport);
+        let translated = this.sprites.map(sprite =>
+            sprite.nickname === nickname
+                ? translateRelativeTo(sprite.setPosition(position))
+                : translateRelativeTo(sprite));
+        return new Game(this.zone, this.viewport, this.player, translated);
     }
 }
 
 (function () {
     var zone = Zone.create(Vector.create(12, 8), Vector.create(24, 16));
     var viewport = Viewport.create(12, 8);
-    var players = [
-        User.create("player1", Vector.create(16, 11)),
-        User.create("player2", Vector.create(18, 9)),
-        User.create("player3", Vector.create(11, 11)),
-        User.create("player4", Vector.create(18, 18))
+    var sprites = [
+        Sprite.create("player1", Vector.create(16, 11)),
+        Sprite.create("player2", Vector.create(18, 9)),
+        Sprite.create("player3", Vector.create(11, 11)),
+        Sprite.create("player4", Vector.create(18, 18))
     ];
-    console.log(players);
-    let main = players[0];
-    let translateRelativeTo = main.translate(zone, viewport);
-    let tranlated = players.map(player => translateRelativeTo(player));
-    console.log(tranlated);
+    let player = Player.create(sprites[0]);
+    let game = Game.create(zone, viewport, player, sprites)
+        .updatePosition("player1", Vector.create(15, 11))
+        .updatePosition("player3", Vector.create(12, 11))
+        .updatePosition("player3", Vector.create(12, 12));
 })();
+

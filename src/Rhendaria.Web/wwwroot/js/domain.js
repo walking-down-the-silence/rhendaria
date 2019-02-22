@@ -65,55 +65,72 @@ var Viewport = /** @class */ (function () {
     return Viewport;
 }());
 var Sprite = /** @class */ (function () {
-    function Sprite(position) {
+    function Sprite(nickname, color, position) {
+        this.nickname = nickname;
+        this.color = color;
         this.position = position;
     }
-    Sprite.create = function (position) {
-        return new Sprite(position);
+    Sprite.create = function (nickname, position) {
+        return new Sprite(nickname, "", position);
+    };
+    Sprite.prototype.setPosition = function (position) {
+        return new Sprite(this.nickname, this.color, position);
     };
     return Sprite;
 }());
-var User = /** @class */ (function () {
-    function User(nickname, sprite) {
-        this.nickname = nickname;
+var Player = /** @class */ (function () {
+    function Player(sprite) {
         this.sprite = sprite;
     }
-    User.create = function (nickname, position) {
-        return new User(nickname, Sprite.create(position));
+    Player.create = function (sprite) {
+        return new Player(sprite);
     };
-    User.prototype.translate = function (zone, viewport) {
+    Player.prototype.translate = function (zone, viewport) {
         var playerToScreenOffset = viewport.getOffsetRelativeTo(zone, this.sprite.position);
         console.log(playerToScreenOffset);
-        return function (player) {
-            var position = player.sprite.position
+        return function (sprite) {
+            var position = sprite.position
                 .subtract(zone.box.topLeft)
                 .subtract(playerToScreenOffset);
-            return User.create(player.nickname, position);
+            return Sprite.create(sprite.nickname, position);
         };
     };
-    return User;
+    return Player;
 }());
-//export {
-//    Vector,
-//    Rectangle,
-//    Zone,
-//    Viewport,
-//    Sprite,
-//    User
-//}
+var Game = /** @class */ (function () {
+    function Game(zone, viewport, player, sprites) {
+        this.zone = zone;
+        this.viewport = viewport;
+        this.player = player;
+        this.sprites = sprites;
+    }
+    Game.create = function (zone, viewport, player, sprites) {
+        return new Game(zone, viewport, player, sprites);
+    };
+    Game.prototype.updatePosition = function (nickname, position) {
+        var translateRelativeTo = this.player.translate(this.zone, this.viewport);
+        var translated = this.sprites.map(function (sprite) {
+            return sprite.nickname === nickname
+                ? translateRelativeTo(sprite.setPosition(position))
+                : translateRelativeTo(sprite);
+        });
+        return new Game(this.zone, this.viewport, this.player, translated);
+    };
+    return Game;
+}());
 (function () {
     var zone = Zone.create(Vector.create(12, 8), Vector.create(24, 16));
     var viewport = Viewport.create(12, 8);
-    var players = [
-        User.create("justmegaara", Vector.create(16, 11)),
-        User.create("leaveme2010", Vector.create(18, 9)),
-        User.create("sickranchez", Vector.create(11, 11)),
-        User.create("alienware51", Vector.create(18, 18))
+    var sprites = [
+        Sprite.create("player1", Vector.create(16, 11)),
+        Sprite.create("player2", Vector.create(18, 9)),
+        Sprite.create("player3", Vector.create(11, 11)),
+        Sprite.create("player4", Vector.create(18, 18))
     ];
-    console.log(players);
-    var main = players[0];
-    var translateRelativeTo = main.translate(zone, viewport);
-    var tranlated = players.map(function (player) { return translateRelativeTo(player); });
-    console.log(tranlated);
+    var player = Player.create(sprites[0]);
+    var game = Game.create(zone, viewport, player, sprites)
+        .updatePosition("player1", Vector.create(15, 11))
+        .updatePosition("player3", Vector.create(12, 11))
+        .updatePosition("player3", Vector.create(12, 12));
 })();
 //# sourceMappingURL=domain.js.map

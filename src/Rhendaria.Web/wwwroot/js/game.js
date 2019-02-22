@@ -42,7 +42,7 @@ class Offset {
     }
 }
 
-class Player {
+class User {
     constructor(username, position, color) {
         if (color === undefined) {
             color = 0xFFBB0B;

@@ -47,12 +47,12 @@ window.game = (function () {
     const positionFactory = () => createRandomPosition(gameOptions.fullWidth, gameOptions.fullHeight);
 
     const state = {
-        player: new Player("justmegaara", new Offset(gameOptions.centerX, gameOptions.centerY)),
+        player: new User("justmegaara", new Offset(gameOptions.centerX, gameOptions.centerY)),
         sprites: [
-            new Player("test player 1", positionFactory(), 0xFF0000),
-            //new Player("test player 2", positionFactory()),
-            //new Player("test player 3", positionFactory()),
-            //new Player("test player 4", positionFactory())
+            new User("test player 1", positionFactory(), 0xFF0000),
+            //new User("test player 2", positionFactory()),
+            //new User("test player 3", positionFactory()),
+            //new User("test player 4", positionFactory())
         ]
     };
 
