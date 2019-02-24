@@ -87,7 +87,6 @@ var Player = /** @class */ (function () {
     };
     Player.prototype.translate = function (zone, viewport) {
         var playerToScreenOffset = viewport.getOffsetRelativeTo(zone, this.sprite.position);
-        console.log(playerToScreenOffset);
         return function (sprite) {
             var position = sprite.position
                 .subtract(zone.box.topLeft)
@@ -118,19 +117,4 @@ var Game = /** @class */ (function () {
     };
     return Game;
 }());
-(function () {
-    var zone = Zone.create(Vector.create(12, 8), Vector.create(24, 16));
-    var viewport = Viewport.create(12, 8);
-    var sprites = [
-        Sprite.create("player1", Vector.create(16, 11)),
-        Sprite.create("player2", Vector.create(18, 9)),
-        Sprite.create("player3", Vector.create(11, 11)),
-        Sprite.create("player4", Vector.create(18, 18))
-    ];
-    var player = Player.create(sprites[0]);
-    var game = Game.create(zone, viewport, player, sprites)
-        .updatePosition("player1", Vector.create(15, 11))
-        .updatePosition("player3", Vector.create(12, 11))
-        .updatePosition("player3", Vector.create(12, 12));
-})();
 //# sourceMappingURL=domain.js.map

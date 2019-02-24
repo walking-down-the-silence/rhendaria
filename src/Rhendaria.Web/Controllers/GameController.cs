@@ -27,14 +27,18 @@ namespace Rhendaria.Web.Controllers
 
             Vector2D position = await _client.GetGrain<IPlayerActor>(username).GetPosition();
 
-            PlayerStateViewModel viewModel = new PlayerStateViewModel
+            SpriteStateViewModel playerViewModel = new SpriteStateViewModel
             {
-                Username = username,
-                PlayerPositionX = position.Left,
-                PlayerPositionY = position.Top
+                Nickname = username,
+                PositionX = position.Left,
+                PositionY = position.Top
+            };
+            GameZoneViewModel gameZoneViewModel = new GameZoneViewModel
+            {
+                Player = playerViewModel
             };
 
-            return View(viewModel);
+            return View(gameZoneViewModel);
         }
     }
 }

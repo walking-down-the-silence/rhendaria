@@ -1,20 +1,20 @@
 ﻿window.gameCommunication = (function () {
     let connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
 
-
-    connection.on("ReceiveMessage", function (user, message) {
-        console.log(user + ':' + 'message');
+    // event subscriptions from backend server
+    connection.on("UpdatePosition", function (nickname, message) {
+        // TODO: update player position
+        console.log(nickname, message);
     });
+    
+    connection.start().catch((err) => console.error(err));
 
-    connection.start().catch(function (err) {
-        return console.error(err.toString());
-    });
-
-    function invoke(user, message) {
-        connection.invoke("SendMessage", user, message).catch(err => console.error(err));
+    // action invocators for frontend client
+    function movePlayer(nickname, position) {
+        connection.invoke("MovePlayer", nickname, position).catch(err => console.error(err));
     }
 
     return {
-        invoke
+        movePlayer
     };
 })();
