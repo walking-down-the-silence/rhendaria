@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>3.3</TypeScriptToolsVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\scripts\domain.ts" />
+    <Content Include="Scripts\game.ts" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +24,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Rhendaria.Abstraction\Rhendaria.Abstraction.csproj" />
     <ProjectReference Include="..\Rhendaria.Engine\Rhendaria.Engine.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\js\" />
   </ItemGroup>
 
 </Project>

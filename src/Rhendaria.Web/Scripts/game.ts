@@ -1,4 +1,7 @@
-﻿class Vector {
+﻿import * as PIXI from "pixi.js"
+import * as signalR from "@aspnet/signalr-client"
+
+class Vector {
     private constructor(
         public readonly x: number,
         public readonly y: number) {
@@ -130,3 +133,105 @@ class Game {
         return new Game(this.zone, this.viewport, this.player, translated);
     }
 }
+
+
+
+///
+/// game communication with backend via websockets
+///
+let gameCommunication = (function () {
+    let connection = new signalR.HubConnection("/gameHub");
+
+    // event subscriptions from backend server
+    connection.on("UpdatePosition", function (nickname, message) {
+        // TODO: update player position
+        console.log(nickname, message);
+    });
+
+    connection.start().catch((err) => console.error(err));
+
+    // action invocators for frontend client
+    function movePlayer(nickname, position) {
+        connection.invoke("MovePlayer", nickname, position).catch(err => console.error(err));
+    }
+
+    return {
+        movePlayer
+    };
+})();
+
+async function loadGame() {
+    let response = await fetch("pavlo.hodysh", { method: "GET" })
+        .then(result => result.json())
+        .catch(error => console.log(error));
+
+    var zone = Zone.create(
+        Vector.create(response.zone.topLeftX, response.zone.topLeftY),
+        Vector.create(response.zone.bottomRightX, response.zone.bottomRightY));
+    var viewport = Viewport.create(12, 8);
+    var sprites = response.sprites.map(sprite => {
+        let position = Vector.create(sprite.positionX, sprite.positionY);
+        return Sprite.create(sprite.nickname, position);
+    });
+    let player = Player.create(
+        Sprite.create(
+            response.player.nickname,
+            Vector.create(
+                response.player.positionX,
+                response.player.positionY)));
+    let game = Game.create(zone, viewport, player, sprites);
+
+    return game;
+};
+
+
+
+///
+/// game view setup and initialization
+///
+let gameOptions = {
+    fullWidth: 0,
+    fullHeight: 0
+};
+
+let mouse = {
+    position: null
+};
+
+let app = (async function () {
+    const container = document.getElementById("game-field");
+    gameOptions = {
+        fullWidth: container.offsetWidth,
+        fullHeight: container.offsetHeight
+    };
+
+    const app = new PIXI.Application({
+        antialias: true,
+        autoResize: true,
+        resolution: devicePixelRatio
+    });
+    app.stage.interactive = true;
+    app.renderer.resize(gameOptions.fullWidth, gameOptions.fullHeight);
+    app.view.addEventListener("mousemove", e => {
+        // TODO: get relative coordinates
+        mouse = {
+            position: Vector.create(e.clientX - container.offsetLeft, e.clientY - container.offsetTop)
+        };
+    });
+
+    container.appendChild(app.view);
+
+    // set up a sprite for player in form of a circle
+    const centerX = gameOptions.fullWidth / 2;
+    const centerY = gameOptions.fullHeight / 2;
+
+    //let game = await loadGame();
+    //game.sprites.forEach(sprite => app.stage.addChild(sprite));
+    //app.stage.addChild(game.player.sprite);
+
+    // event subscriptions
+    app.ticker.add(function () { /* move sprites here */ });
+    window.addEventListener("resize", () => app.renderer.resize(window.innerWidth, window.innerHeight));
+
+    return app;
+})();

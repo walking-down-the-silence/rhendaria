@@ -54,6 +54,7 @@ namespace Rhendaria.Web
                 options.OAuthAppName("Swagger UI");
             });
 
+            app.UseDefaultFiles();
             app.UseStaticFiles();
             app.UseCookiePolicy();
 

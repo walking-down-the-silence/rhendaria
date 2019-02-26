@@ -1,0 +1,12 @@
+{
+  "version": "1.0.0",
+  "name": "asp.net",
+  "private": true,
+  "devDependencies": {
+    "@types/pixi.js": "4.8.6",
+    "@aspnet/signalr-client": "1.0.0-alpha2-final"
+  },
+  "scripts": {
+    "build:webpack": "webpack"
+  }
+}

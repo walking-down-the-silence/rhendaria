@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Rhendaria.Web.Controllers;
+using System.Collections.Generic;
 
 namespace Rhendaria.Web.Models
 {
@@ -7,5 +8,7 @@ namespace Rhendaria.Web.Models
         public SpriteStateViewModel Player { get; set; }
 
         public ICollection<SpriteStateViewModel> Sprites { get; set; }
+
+        public ZoneViewModel Zone { get; set; }
     }
 }
