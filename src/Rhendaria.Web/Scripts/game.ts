@@ -53,6 +53,16 @@ class Zone {
         let box = Rectangle.create(topLeft, bottomRight);
         return new Zone(box);
     }
+
+    static fromRaw(raw: any) {
+        if (raw) {
+            let topLeft = Vector.create(raw.box.topLeft.x, raw.box.topLeft.y);
+            let bottomRight = Vector.create(raw.box.bottomRight.x, raw.box.bottomRight.y);
+            let rectangle = Rectangle.create(topLeft, bottomRight);
+            return new Zone(rectangle);
+        }
+        return null;
+    }
 }
 
 class Viewport {
@@ -82,6 +92,14 @@ class Sprite {
 
     static create(nickname: string, position: Vector) {
         return new Sprite(nickname, "", position);
+    }
+
+    static fromRaw(raw: any) {
+        if (raw) {
+            let position = Vector.create(raw.position.x, raw.position.y);
+            return new Sprite(raw.nickname, raw.color, position);
+        }
+        return null;
     }
 
     setPosition(position: Vector) {

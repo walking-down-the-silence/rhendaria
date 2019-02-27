@@ -3,21 +3,33 @@
 /**
  * game view setup and initialization
  * */
-let gameOptions = {
-    fullWidth: 0,
-    fullHeight: 0
-};
+async function initializeGame(nickname: string) {
+    let url = `http://localhost:59023/api/player/${nickname}`;
+    let response = await fetch(url, { method: "GET" })
+        .then(result => result.json())
+        .catch(error => console.log(error));
 
-let mouse = {
-    position: null
-};
+    let zone = Zone.fromRaw(response.zone);
+    let viewport = Viewport.create(12, 8);
+    let player = Player.create(Sprite.fromRaw(response.player));
+    let sprites = response.sprites ? response.sprites.map(sprite => Sprite.fromRaw(sprite)) : [];
+
+    let game = Game.create(zone, viewport, player, sprites);
+    console.log(this.game);
+    return game;
+}
 
 let app = (async function () {
     const container = document.getElementById("game-field");
-    gameOptions = {
+    let gameOptions = {
         fullWidth: container.offsetWidth,
         fullHeight: container.offsetHeight
     };
+
+    let gameChannel = new GameChannel();
+    await gameChannel.setupCommunicationChannel();
+
+    let game = await initializeGame("aaaaa");
 
     const app = new PIXI.Application({
         antialias: true,
@@ -28,20 +40,19 @@ let app = (async function () {
     app.renderer.resize(gameOptions.fullWidth, gameOptions.fullHeight);
     app.view.addEventListener("mousemove", e => {
         // TODO: get relative coordinates
-        mouse = {
+        let mouse = {
             position: Vector.create(e.clientX - container.offsetLeft, e.clientY - container.offsetTop)
         };
     });
 
     container.appendChild(app.view);
+    //game.sprites
+    //    .concat(game.player.sprite)
+    //    .forEach(sprite => app.stage.addChild(sprite.view));
 
     // set up a sprite for player in form of a circle
     const centerX = gameOptions.fullWidth / 2;
     const centerY = gameOptions.fullHeight / 2;
-
-    //let game = await loadGame();
-    //game.sprites.forEach(sprite => app.stage.addChild(sprite));
-    //app.stage.addChild(game.player.sprite);
 
     // event subscriptions
     app.ticker.add(function () { /* move sprites here */ });

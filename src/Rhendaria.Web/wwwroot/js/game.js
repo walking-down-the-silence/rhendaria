@@ -46,6 +46,15 @@ var Zone = /** @class */ (function () {
         var box = Rectangle.create(topLeft, bottomRight);
         return new Zone(box);
     };
+    Zone.fromRaw = function (raw) {
+        if (raw) {
+            var topLeft = Vector.create(raw.box.topLeft.x, raw.box.topLeft.y);
+            var bottomRight = Vector.create(raw.box.bottomRight.x, raw.box.bottomRight.y);
+            var rectangle = Rectangle.create(topLeft, bottomRight);
+            return new Zone(rectangle);
+        }
+        return null;
+    };
     return Zone;
 }());
 var Viewport = /** @class */ (function () {
@@ -72,6 +81,13 @@ var Sprite = /** @class */ (function () {
     }
     Sprite.create = function (nickname, position) {
         return new Sprite(nickname, "", position);
+    };
+    Sprite.fromRaw = function (raw) {
+        if (raw) {
+            var position = Vector.create(raw.position.x, raw.position.y);
+            return new Sprite(raw.nickname, raw.color, position);
+        }
+        return null;
     };
     Sprite.prototype.setPosition = function (position) {
         return new Sprite(this.nickname, this.color, position);

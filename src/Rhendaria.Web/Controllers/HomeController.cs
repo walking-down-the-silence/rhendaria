@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Orleans;
-using Rhendaria.Abstraction;
 using Rhendaria.Abstraction.Actors;
 using Rhendaria.Web.Extensions;
 using Rhendaria.Web.Models;
@@ -27,8 +26,8 @@ namespace Rhendaria.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> JoinGame([Bind] JoinGameViewModel viewModel)
         {
-            string username = await _client.GetGrain<IPlayerActor>(viewModel.Username).GetUsername();
-            return RedirectToAction(nameof(GameController.Index), this.NameOf<GameController>(), new { username });
+            string nickname = await _client.GetGrain<IPlayerActor>(viewModel.Username).GetUsername();
+            return RedirectToAction(nameof(GameController.Index), this.NameOf<GameController>());
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
