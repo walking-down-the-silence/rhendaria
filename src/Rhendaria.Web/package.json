@@ -2,9 +2,13 @@
   "version": "1.0.0",
   "name": "asp.net",
   "private": true,
+  "dependencies": {
+    "requirejs": "2.3.6"
+  },
   "devDependencies": {
-    "@types/pixi.js": "4.8.6",
-    "@aspnet/signalr-client": "1.0.0-alpha2-final"
+    "@aspnet/signalr": "^1.1.2",
+    "@types/node": "11.9.5",
+    "@types/pixi.js": "4.8.6"
   },
   "scripts": {
     "build:webpack": "webpack"

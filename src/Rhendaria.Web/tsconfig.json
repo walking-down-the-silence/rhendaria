@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "module": "amd",
+    "moduleResolution": "node",
     "noImplicitAny": false,
     "noEmitOnError": true,
     "removeComments": false,
@@ -8,10 +10,12 @@
     "outDir": "wwwroot/js",
     "lib": [
       "es2015",
-      "dom",
       "es5",
       "dom"
     ]
   },
+  "exclude": [
+    "node_modules"
+  ],
   "compileOnSave": true
 }

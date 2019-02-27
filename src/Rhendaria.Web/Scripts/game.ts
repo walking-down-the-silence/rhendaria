@@ -1,5 +1,5 @@
 ﻿import * as PIXI from "pixi.js"
-import * as signalR from "@aspnet/signalr-client"
+import * as signalR from "@aspnet/signalr"
 
 class Vector {
     private constructor(
@@ -140,7 +140,7 @@ class Game {
 /// game communication with backend via websockets
 ///
 let gameCommunication = (function () {
-    let connection = new signalR.HubConnection("/gameHub");
+    let connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
 
     // event subscriptions from backend server
     connection.on("UpdatePosition", function (nickname, message) {
