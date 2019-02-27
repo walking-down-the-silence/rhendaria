@@ -36,14 +36,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 /**
  * game view setup and initialization
- * */
+ **/
 function initializeGame(nickname) {
     return __awaiter(this, void 0, void 0, function () {
         var url, response, zone, viewport, player, sprites, game;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    url = "http://localhost:59023/api/player/" + nickname;
+                    url = "http://localhost:54016/api/player/" + nickname;
                     return [4 /*yield*/, fetch(url, { method: "GET" })
                             .then(function (result) { return result.json(); })
                             .catch(function (error) { return console.log(error); })];
@@ -54,7 +54,7 @@ function initializeGame(nickname) {
                     player = Player.create(Sprite.fromRaw(response.player));
                     sprites = response.sprites ? response.sprites.map(function (sprite) { return Sprite.fromRaw(sprite); }) : [];
                     game = Game.create(zone, viewport, player, sprites);
-                    console.log(this.game);
+                    console.log(game);
                     return [2 /*return*/, game];
             }
         });
@@ -62,7 +62,7 @@ function initializeGame(nickname) {
 }
 var app = (function () {
     return __awaiter(this, void 0, void 0, function () {
-        var container, gameOptions, gameChannel, game, app, centerX, centerY;
+        var container, gameOptions, app, gameChannel, game;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -71,13 +71,6 @@ var app = (function () {
                         fullWidth: container.offsetWidth,
                         fullHeight: container.offsetHeight
                     };
-                    gameChannel = new GameChannel();
-                    return [4 /*yield*/, gameChannel.setupCommunicationChannel()];
-                case 1:
-                    _a.sent();
-                    return [4 /*yield*/, initializeGame("aaaaa")];
-                case 2:
-                    game = _a.sent();
                     app = new PIXI.Application({
                         antialias: true,
                         autoResize: true,
@@ -92,8 +85,17 @@ var app = (function () {
                         };
                     });
                     container.appendChild(app.view);
-                    centerX = gameOptions.fullWidth / 2;
-                    centerY = gameOptions.fullHeight / 2;
+                    gameChannel = new GameChannel();
+                    return [4 /*yield*/, gameChannel.setupCommunicationChannel()];
+                case 1:
+                    _a.sent();
+                    return [4 /*yield*/, initializeGame("justmegaara")];
+                case 2:
+                    game = _a.sent();
+                    game.sprites
+                        .concat(game.player.sprite)
+                        .forEach(function (sprite) { return app.stage.addChild(sprite.view); });
+                    gameChannel.setGame(game);
                     // event subscriptions
                     app.ticker.add(function () { });
                     window.addEventListener("resize", function () { return app.renderer.resize(window.innerWidth, window.innerHeight); });

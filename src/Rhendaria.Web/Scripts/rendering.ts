@@ -2,9 +2,9 @@
 
 /**
  * game view setup and initialization
- * */
+ **/
 async function initializeGame(nickname: string) {
-    let url = `http://localhost:59023/api/player/${nickname}`;
+    let url = `http://localhost:54016/api/player/${nickname}`;
     let response = await fetch(url, { method: "GET" })
         .then(result => result.json())
         .catch(error => console.log(error));
@@ -15,7 +15,7 @@ async function initializeGame(nickname: string) {
     let sprites = response.sprites ? response.sprites.map(sprite => Sprite.fromRaw(sprite)) : [];
 
     let game = Game.create(zone, viewport, player, sprites);
-    console.log(this.game);
+    console.log(game);
     return game;
 }
 
@@ -25,11 +25,6 @@ let app = (async function () {
         fullWidth: container.offsetWidth,
         fullHeight: container.offsetHeight
     };
-
-    let gameChannel = new GameChannel();
-    await gameChannel.setupCommunicationChannel();
-
-    let game = await initializeGame("aaaaa");
 
     const app = new PIXI.Application({
         antialias: true,
@@ -46,13 +41,16 @@ let app = (async function () {
     });
 
     container.appendChild(app.view);
-    //game.sprites
-    //    .concat(game.player.sprite)
-    //    .forEach(sprite => app.stage.addChild(sprite.view));
 
-    // set up a sprite for player in form of a circle
-    const centerX = gameOptions.fullWidth / 2;
-    const centerY = gameOptions.fullHeight / 2;
+    let gameChannel = new GameChannel();
+    await gameChannel.setupCommunicationChannel();
+
+    let game = await initializeGame("justmegaara");
+    game.sprites
+        .concat(game.player.sprite)
+        .forEach(sprite => app.stage.addChild(sprite.view));
+
+    gameChannel.setGame(game);
 
     // event subscriptions
     app.ticker.add(function () { /* move sprites here */ });

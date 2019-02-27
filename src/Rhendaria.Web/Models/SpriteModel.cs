@@ -4,6 +4,8 @@
     {
         public string Nickname { get; set; }
 
+        public int Color { get; set; }
+
         public VectorModel Position { get; set; }
     }
 }

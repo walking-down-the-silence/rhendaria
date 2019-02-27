@@ -1,3 +1,4 @@
+/// <reference path="../node_modules/@types/pixi.js/index.d.ts" />
 var Vector = /** @class */ (function () {
     function Vector(x, y) {
         this.x = x;
@@ -74,13 +75,26 @@ var Viewport = /** @class */ (function () {
     return Viewport;
 }());
 var Sprite = /** @class */ (function () {
-    function Sprite(nickname, color, position) {
+    function Sprite(nickname, color, position, view) {
+        if (view === void 0) { view = null; }
         this.nickname = nickname;
         this.color = color;
         this.position = position;
+        this.view = view;
+        if (view) {
+            this.view = view;
+            this.view.x = position.x;
+            this.view.y = position.y;
+        }
+        else {
+            this.view = new PIXI.Graphics();
+            this.view.beginFill(color, 1);
+            this.view.drawCircle(position.x, position.y, 50);
+            this.view.endFill();
+        }
     }
-    Sprite.create = function (nickname, position) {
-        return new Sprite(nickname, "", position);
+    Sprite.create = function (nickname, color, position) {
+        return new Sprite(nickname, color, position);
     };
     Sprite.fromRaw = function (raw) {
         if (raw) {
@@ -90,7 +104,7 @@ var Sprite = /** @class */ (function () {
         return null;
     };
     Sprite.prototype.setPosition = function (position) {
-        return new Sprite(this.nickname, this.color, position);
+        return new Sprite(this.nickname, this.color, position, this.view);
     };
     return Sprite;
 }());
@@ -107,7 +121,7 @@ var Player = /** @class */ (function () {
             var position = sprite.position
                 .subtract(zone.box.topLeft)
                 .subtract(playerToScreenOffset);
-            return Sprite.create(sprite.nickname, position);
+            return Sprite.create(sprite.nickname, sprite.color, position);
         };
     };
     return Player;

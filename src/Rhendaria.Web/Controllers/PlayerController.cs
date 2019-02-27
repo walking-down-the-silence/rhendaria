@@ -37,19 +37,35 @@ namespace Rhendaria.Web.Controllers
             var position = await playerActor.GetPosition();
             //var zone = await zoneActor.
 
-            GameModel gameZoneViewModel = new GameModel
+            var gameZoneViewModel = new GameModel
             {
                 Player = new SpriteModel
                 {
                     Nickname = nickname,
+                    Color = 0x3366FF,
                     Position = new VectorModel { X = position.Left, Y = position.Top }
                 },
                 Zone = new ZoneModel
                 {
                     Box = new BoxModel
                     {
-                        TopLeft = new VectorModel { X = 12, Y = 8 },
-                        BottomRight = new VectorModel { X = 24, Y = 16 }
+                        TopLeft = new VectorModel { X = 120, Y = 80 },
+                        BottomRight = new VectorModel { X = 840, Y = 920 }
+                    }
+                },
+                Sprites = new[]
+                {
+                    new SpriteModel
+                    {
+                        Nickname = "sickranchez",
+                        Color = 0x339966,
+                        Position = new VectorModel { X = 110, Y = 110 }
+                    },
+                    new SpriteModel
+                    {
+                        Nickname = "alienware51",
+                        Color = 0xFFFF99,
+                        Position = new VectorModel { X = 180, Y = 180 }
                     }
                 }
             };
@@ -70,9 +86,11 @@ namespace Rhendaria.Web.Controllers
 
             Vector2D position = await player.Move(command.Direction);
             await zone.RoutePlayerMovement(player);
-            await _hubContext.Clients.All.SendAsync("UpdatePosition", nickname, position);
 
-            return Ok(position);
+            var playerPosition = new VectorModel { X = position.Left, Y = position.Top };
+            await _hubContext.Clients.All.SendAsync("UpdatePosition", nickname, playerPosition);
+
+            return Ok(playerPosition);
         }
     }
 }

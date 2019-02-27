@@ -1,4 +1,6 @@
-﻿class Vector {
+﻿/// <reference path="../node_modules/@types/pixi.js/index.d.ts" />
+
+class Vector {
     private constructor(
         public readonly x: number,
         public readonly y: number) {
@@ -86,12 +88,25 @@ class Viewport {
 class Sprite {
     private constructor(
         public readonly nickname: string,
-        public readonly color: string,
-        public readonly position: Vector) {
+        public readonly color: number,
+        public readonly position: Vector,
+        public readonly view: PIXI.Graphics = null) {
+
+        if (view) {
+            this.view = view;
+            this.view.x = position.x;
+            this.view.y = position.y;
+        }
+        else {
+            this.view = new PIXI.Graphics();
+            this.view.beginFill(color, 1);
+            this.view.drawCircle(position.x, position.y, 50);
+            this.view.endFill();
+        }
     }
 
-    static create(nickname: string, position: Vector) {
-        return new Sprite(nickname, "", position);
+    static create(nickname: string, color: number, position: Vector) {
+        return new Sprite(nickname, color, position);
     }
 
     static fromRaw(raw: any) {
@@ -103,7 +118,7 @@ class Sprite {
     }
 
     setPosition(position: Vector) {
-        return new Sprite(this.nickname, this.color, position);
+        return new Sprite(this.nickname, this.color, position, this.view);
     }
 }
 
@@ -122,7 +137,7 @@ class Player {
             let position = sprite.position
                 .subtract(zone.box.topLeft)
                 .subtract(playerToScreenOffset);
-            return Sprite.create(sprite.nickname, position);
+            return Sprite.create(sprite.nickname, sprite.color, position);
         }
     }
 }
