@@ -1,7 +1,5 @@
 {
   "compilerOptions": {
-    "module": "amd",
-    "moduleResolution": "node",
     "noImplicitAny": false,
     "noEmitOnError": true,
     "removeComments": false,

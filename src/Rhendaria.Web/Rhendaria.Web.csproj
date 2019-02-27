@@ -6,6 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Scripts\communication.ts" />
+    <None Remove="Scripts\rendering.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="Scripts\game.ts" />
   </ItemGroup>
 
@@ -31,6 +36,11 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\js\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="Scripts\communication.ts" />
+    <TypeScriptCompile Include="Scripts\rendering.ts" />
   </ItemGroup>
 
 </Project>
