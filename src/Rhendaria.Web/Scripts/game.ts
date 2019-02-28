@@ -76,31 +76,25 @@ class Viewport {
         let size = Vector.create(width, height);
         return new Viewport(size);
     }
-
-    getOffsetRelativeTo(zone: Zone, position: Vector) {
-        let viewportCenter = this.size.divide(2);
-        return position
-            .subtract(zone.box.topLeft)
-            .subtract(viewportCenter);
-    }
 }
 
 class Sprite {
     private constructor(
         public readonly nickname: string,
         public readonly color: number,
-        public readonly position: Vector,
+        public readonly actual: Vector,
+        public readonly relative: Vector = null,
         public readonly view: PIXI.Graphics = null) {
 
         if (view) {
             this.view = view;
-            this.view.x = position.x;
-            this.view.y = position.y;
+            this.view.x = actual.x;
+            this.view.y = actual.y;
         }
         else {
             this.view = new PIXI.Graphics();
             this.view.beginFill(color, 1);
-            this.view.drawCircle(position.x, position.y, 50);
+            this.view.drawCircle(actual.x, actual.y, 50);
             this.view.endFill();
         }
     }
@@ -117,8 +111,12 @@ class Sprite {
         return null;
     }
 
-    setPosition(position: Vector) {
-        return new Sprite(this.nickname, this.color, position, this.view);
+    setActualPosition(actual: Vector) {
+        return new Sprite(this.nickname, this.color, actual, this.relative, this.view);
+    }
+
+    setRelativePosition(relative: Vector) {
+        return new Sprite(this.nickname, this.color, this.actual, relative, this.view);
     }
 }
 
@@ -130,36 +128,47 @@ class Player {
     static create(sprite: Sprite) {
         return new Player(sprite);
     }
-
-    translate(zone: Zone, viewport: Viewport) {
-        let playerToScreenOffset = viewport.getOffsetRelativeTo(zone, this.sprite.position);
-        return (sprite: Sprite) => {
-            let position = sprite.position
-                .subtract(zone.box.topLeft)
-                .subtract(playerToScreenOffset);
-            return Sprite.create(sprite.nickname, sprite.color, position);
-        }
-    }
 }
 
 class Game {
     private constructor(
-        public readonly zone: Zone,
-        public readonly viewport: Viewport,
-        public readonly player: Player,
-        public readonly sprites: Sprite[]) {
+        public zone: Zone,
+        public viewport: Viewport,
+        public player: Player,
+        public sprites: Sprite[]) {
     }
 
     static create(zone: Zone, viewport: Viewport, player: Player, sprites: Sprite[]) {
         return new Game(zone, viewport, player, sprites);
     }
 
+    static fromRaw(raw: any) {
+        let viewport = Viewport.create(0, 0);
+        let zone = Zone.fromRaw(raw.zone);
+        let player = Player.create(Sprite.fromRaw(raw.player));
+        let sprites = raw.sprites ? raw.sprites.map(sprite => Sprite.fromRaw(sprite)) : [];
+        return new Game(zone, viewport, player, sprites);
+    }
+
+    changeViewport(width: number, height: number) {
+        let viewport = Viewport.create(width, height);
+        this.viewport = viewport;
+        return this;
+    }
+
     updatePosition(nickname: string, position: Vector) {
-        let translateRelativeTo = this.player.translate(this.zone, this.viewport);
-        let translated = this.sprites.map(sprite =>
-            sprite.nickname === nickname
-                ? translateRelativeTo(sprite.setPosition(position))
-                : translateRelativeTo(sprite));
-        return new Game(this.zone, this.viewport, this.player, translated);
+        let sprites = this.sprites.map(sprite => {
+            return sprite.nickname !== nickname
+                ? sprite
+                : this.updateSpritePosition(sprite, position);
+        });
+        this.sprites = sprites;
+        return this;
+    }
+
+    private updateSpritePosition(sprite: Sprite, actual: Vector) {
+        let offset = this.player.sprite.actual.subtract(actual);
+        let relative = this.viewport.size.divide(2).subtract(offset);
+        return sprite.setActualPosition(actual).setRelativePosition(relative);
     }
 }

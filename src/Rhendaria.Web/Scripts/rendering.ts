@@ -3,58 +3,60 @@
 /**
  * game view setup and initialization
  **/
-async function initializeGame(nickname: string) {
-    let url = `http://localhost:54016/api/player/${nickname}`;
-    let response = await fetch(url, { method: "GET" })
+async function loadGameView(nickname: string) {
+    let url = `http://localhost:59023/api/player/${nickname}`;
+    return fetch(url, { method: "GET" })
         .then(result => result.json())
         .catch(error => console.log(error));
-
-    let zone = Zone.fromRaw(response.zone);
-    let viewport = Viewport.create(12, 8);
-    let player = Player.create(Sprite.fromRaw(response.player));
-    let sprites = response.sprites ? response.sprites.map(sprite => Sprite.fromRaw(sprite)) : [];
-
-    let game = Game.create(zone, viewport, player, sprites);
-    console.log(game);
-    return game;
 }
 
-let app = (async function () {
+function resizeRenderingViewport(renderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer) {
     const container = document.getElementById("game-field");
-    let gameOptions = {
-        fullWidth: container.offsetWidth,
-        fullHeight: container.offsetHeight
-    };
+    console.log(container.offsetWidth, container.offsetHeight);
+    renderer.resize(container.offsetWidth, container.offsetHeight);
+}
 
+const container = document.getElementById("game-field");
+
+let game: Game = null;
+
+let app = (async function () {
     const app = new PIXI.Application({
         antialias: true,
         autoResize: true,
         resolution: devicePixelRatio
     });
     app.stage.interactive = true;
-    app.renderer.resize(gameOptions.fullWidth, gameOptions.fullHeight);
     app.view.addEventListener("mousemove", e => {
         // TODO: get relative coordinates
-        let mouse = {
-            position: Vector.create(e.clientX - container.offsetLeft, e.clientY - container.offsetTop)
-        };
+        //let mouse = {
+        //    position: Vector.create(e.clientX - container.offsetLeft, e.clientY - container.offsetTop)
+        //};
     });
+    resizeRenderingViewport(app.renderer);
 
+    const container = document.getElementById("game-field");
     container.appendChild(app.view);
 
-    let gameChannel = new GameChannel();
-    await gameChannel.setupCommunicationChannel();
-
-    let game = await initializeGame("justmegaara");
+    game = await loadGameView("justmegaara")
+        .then(raw => Game.fromRaw(raw))
+        .then(game => game.changeViewport(container.offsetWidth, container.offsetHeight));
     game.sprites
         .concat(game.player.sprite)
         .forEach(sprite => app.stage.addChild(sprite.view));
 
-    gameChannel.setGame(game);
+
+    let gameChannel = new GameChannel();
+    await gameChannel.setupCommunicationChannel();
+
+    gameChannel.onUpdatePosition((nickname: any, position: any) => {
+        console.log(position);
+        game.updatePosition(nickname, position);
+    });
 
     // event subscriptions
     app.ticker.add(function () { /* move sprites here */ });
-    window.addEventListener("resize", () => app.renderer.resize(window.innerWidth, window.innerHeight));
+    window.addEventListener("resize", () => resizeRenderingViewport(app.renderer));
 
     return app;
 })();

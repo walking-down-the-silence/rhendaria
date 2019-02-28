@@ -66,30 +66,26 @@ var Viewport = /** @class */ (function () {
         var size = Vector.create(width, height);
         return new Viewport(size);
     };
-    Viewport.prototype.getOffsetRelativeTo = function (zone, position) {
-        var viewportCenter = this.size.divide(2);
-        return position
-            .subtract(zone.box.topLeft)
-            .subtract(viewportCenter);
-    };
     return Viewport;
 }());
 var Sprite = /** @class */ (function () {
-    function Sprite(nickname, color, position, view) {
+    function Sprite(nickname, color, actual, relative, view) {
+        if (relative === void 0) { relative = null; }
         if (view === void 0) { view = null; }
         this.nickname = nickname;
         this.color = color;
-        this.position = position;
+        this.actual = actual;
+        this.relative = relative;
         this.view = view;
         if (view) {
             this.view = view;
-            this.view.x = position.x;
-            this.view.y = position.y;
+            this.view.x = actual.x;
+            this.view.y = actual.y;
         }
         else {
             this.view = new PIXI.Graphics();
             this.view.beginFill(color, 1);
-            this.view.drawCircle(position.x, position.y, 50);
+            this.view.drawCircle(actual.x, actual.y, 50);
             this.view.endFill();
         }
     }
@@ -103,8 +99,11 @@ var Sprite = /** @class */ (function () {
         }
         return null;
     };
-    Sprite.prototype.setPosition = function (position) {
-        return new Sprite(this.nickname, this.color, position, this.view);
+    Sprite.prototype.setActualPosition = function (actual) {
+        return new Sprite(this.nickname, this.color, actual, this.relative, this.view);
+    };
+    Sprite.prototype.setRelativePosition = function (relative) {
+        return new Sprite(this.nickname, this.color, this.actual, relative, this.view);
     };
     return Sprite;
 }());
@@ -114,15 +113,6 @@ var Player = /** @class */ (function () {
     }
     Player.create = function (sprite) {
         return new Player(sprite);
-    };
-    Player.prototype.translate = function (zone, viewport) {
-        var playerToScreenOffset = viewport.getOffsetRelativeTo(zone, this.sprite.position);
-        return function (sprite) {
-            var position = sprite.position
-                .subtract(zone.box.topLeft)
-                .subtract(playerToScreenOffset);
-            return Sprite.create(sprite.nickname, sprite.color, position);
-        };
     };
     return Player;
 }());
@@ -136,14 +126,32 @@ var Game = /** @class */ (function () {
     Game.create = function (zone, viewport, player, sprites) {
         return new Game(zone, viewport, player, sprites);
     };
+    Game.fromRaw = function (raw) {
+        var viewport = Viewport.create(0, 0);
+        var zone = Zone.fromRaw(raw.zone);
+        var player = Player.create(Sprite.fromRaw(raw.player));
+        var sprites = raw.sprites ? raw.sprites.map(function (sprite) { return Sprite.fromRaw(sprite); }) : [];
+        return new Game(zone, viewport, player, sprites);
+    };
+    Game.prototype.changeViewport = function (width, height) {
+        var viewport = Viewport.create(width, height);
+        this.viewport = viewport;
+        return this;
+    };
     Game.prototype.updatePosition = function (nickname, position) {
-        var translateRelativeTo = this.player.translate(this.zone, this.viewport);
-        var translated = this.sprites.map(function (sprite) {
-            return sprite.nickname === nickname
-                ? translateRelativeTo(sprite.setPosition(position))
-                : translateRelativeTo(sprite);
+        var _this = this;
+        var sprites = this.sprites.map(function (sprite) {
+            return sprite.nickname !== nickname
+                ? sprite
+                : _this.updateSpritePosition(sprite, position);
         });
-        return new Game(this.zone, this.viewport, this.player, translated);
+        this.sprites = sprites;
+        return this;
+    };
+    Game.prototype.updateSpritePosition = function (sprite, actual) {
+        var offset = this.player.sprite.actual.subtract(actual);
+        var relative = this.viewport.size.divide(2).subtract(offset);
+        return sprite.setActualPosition(actual).setRelativePosition(relative);
     };
     return Game;
 }());

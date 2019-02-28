@@ -49,8 +49,8 @@ namespace Rhendaria.Web.Controllers
                 {
                     Box = new BoxModel
                     {
-                        TopLeft = new VectorModel { X = 120, Y = 80 },
-                        BottomRight = new VectorModel { X = 840, Y = 920 }
+                        TopLeft = new VectorModel { X = 1280, Y = 720 },
+                        BottomRight = new VectorModel { X = 2560, Y = 1440 }
                     }
                 },
                 Sprites = new[]
@@ -59,13 +59,13 @@ namespace Rhendaria.Web.Controllers
                     {
                         Nickname = "sickranchez",
                         Color = 0x339966,
-                        Position = new VectorModel { X = 110, Y = 110 }
+                        Position = new VectorModel { X = 1650, Y = 1100 }
                     },
                     new SpriteModel
                     {
                         Nickname = "alienware51",
                         Color = 0xFFFF99,
-                        Position = new VectorModel { X = 180, Y = 180 }
+                        Position = new VectorModel { X = 1800, Y = 1150 }
                     }
                 }
             };

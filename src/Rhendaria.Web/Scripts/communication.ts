@@ -5,11 +5,9 @@
  **/
 class GameChannel {
     private connection: signalR.HubConnection;
-    private game: Game;
 
     setupCommunicationChannel() {
         this.connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
-        this.connection.on("UpdatePosition", this.handleUpdatePosition);
         return this.connection.start().catch((err) => console.error(err));
     }
 
@@ -21,14 +19,7 @@ class GameChannel {
         return this.connection.invoke("MovePlayer", nickname, position).catch(err => console.error(err));
     }
 
-    setGame(game: Game) {
-        this.game = game;
-        console.log(game, this.game);
-    }
-
-    private handleUpdatePosition(nickname: any, position: any) {
-        // TODO: update player position
-        console.log(nickname, position);
-        this.game = this.game.updatePosition(nickname, position);
+    onUpdatePosition(handleUpdatePosition: (nickname: any, position: any) => void) {
+        this.connection.on("UpdatePosition", handleUpdatePosition);
     }
 }

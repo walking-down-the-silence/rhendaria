@@ -37,68 +37,64 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 /**
  * game view setup and initialization
  **/
-function initializeGame(nickname) {
+function loadGameView(nickname) {
     return __awaiter(this, void 0, void 0, function () {
-        var url, response, zone, viewport, player, sprites, game;
+        var url;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    url = "http://localhost:54016/api/player/" + nickname;
-                    return [4 /*yield*/, fetch(url, { method: "GET" })
-                            .then(function (result) { return result.json(); })
-                            .catch(function (error) { return console.log(error); })];
-                case 1:
-                    response = _a.sent();
-                    zone = Zone.fromRaw(response.zone);
-                    viewport = Viewport.create(12, 8);
-                    player = Player.create(Sprite.fromRaw(response.player));
-                    sprites = response.sprites ? response.sprites.map(function (sprite) { return Sprite.fromRaw(sprite); }) : [];
-                    game = Game.create(zone, viewport, player, sprites);
-                    console.log(game);
-                    return [2 /*return*/, game];
-            }
+            url = "http://localhost:59023/api/player/" + nickname;
+            return [2 /*return*/, fetch(url, { method: "GET" })
+                    .then(function (result) { return result.json(); })
+                    .catch(function (error) { return console.log(error); })];
         });
     });
 }
+function resizeRenderingViewport(renderer) {
+    var container = document.getElementById("game-field");
+    console.log(container.offsetWidth, container.offsetHeight);
+    renderer.resize(container.offsetWidth, container.offsetHeight);
+}
+var container = document.getElementById("game-field");
+var game = null;
 var app = (function () {
     return __awaiter(this, void 0, void 0, function () {
-        var container, gameOptions, app, gameChannel, game;
+        var app, container, gameChannel;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    container = document.getElementById("game-field");
-                    gameOptions = {
-                        fullWidth: container.offsetWidth,
-                        fullHeight: container.offsetHeight
-                    };
                     app = new PIXI.Application({
                         antialias: true,
                         autoResize: true,
                         resolution: devicePixelRatio
                     });
                     app.stage.interactive = true;
-                    app.renderer.resize(gameOptions.fullWidth, gameOptions.fullHeight);
                     app.view.addEventListener("mousemove", function (e) {
                         // TODO: get relative coordinates
-                        var mouse = {
-                            position: Vector.create(e.clientX - container.offsetLeft, e.clientY - container.offsetTop)
-                        };
+                        //let mouse = {
+                        //    position: Vector.create(e.clientX - container.offsetLeft, e.clientY - container.offsetTop)
+                        //};
                     });
+                    resizeRenderingViewport(app.renderer);
+                    container = document.getElementById("game-field");
                     container.appendChild(app.view);
-                    gameChannel = new GameChannel();
-                    return [4 /*yield*/, gameChannel.setupCommunicationChannel()];
+                    return [4 /*yield*/, loadGameView("justmegaara")
+                            .then(function (raw) { return Game.fromRaw(raw); })
+                            .then(function (game) { return game.changeViewport(container.offsetWidth, container.offsetHeight); })];
                 case 1:
-                    _a.sent();
-                    return [4 /*yield*/, initializeGame("justmegaara")];
-                case 2:
                     game = _a.sent();
                     game.sprites
                         .concat(game.player.sprite)
                         .forEach(function (sprite) { return app.stage.addChild(sprite.view); });
-                    gameChannel.setGame(game);
+                    gameChannel = new GameChannel();
+                    return [4 /*yield*/, gameChannel.setupCommunicationChannel()];
+                case 2:
+                    _a.sent();
+                    gameChannel.onUpdatePosition(function (nickname, position) {
+                        console.log(position);
+                        game.updatePosition(nickname, position);
+                    });
                     // event subscriptions
                     app.ticker.add(function () { });
-                    window.addEventListener("resize", function () { return app.renderer.resize(window.innerWidth, window.innerHeight); });
+                    window.addEventListener("resize", function () { return resizeRenderingViewport(app.renderer); });
                     return [2 /*return*/, app];
             }
         });
