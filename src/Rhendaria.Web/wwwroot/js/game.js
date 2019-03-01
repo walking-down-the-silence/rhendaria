@@ -20,12 +20,12 @@ var Vector = /** @class */ (function () {
         var y = this.y - vector.y;
         return new Vector(x, y);
     };
-    Vector.prototype.multiply = function (scale) {
+    Vector.prototype.scale = function (scale) {
         var x = this.x * scale;
         var y = this.y * scale;
         return new Vector(x, y);
     };
-    Vector.prototype.divide = function (scale) {
+    Vector.prototype.shrink = function (scale) {
         var x = this.x / scale;
         var y = this.y / scale;
         return new Vector(x, y);
@@ -162,7 +162,7 @@ var Game = /** @class */ (function () {
         var player = sprite.setActualPosition(actual);
         // relative for current player is always in the center
         // TODO: is this check needed for all players except current?
-        var relative = this.viewport.size.divide(2);
+        var relative = this.viewport.size.shrink(2);
         return player.setRelativePosition(relative);
     };
     Game.prototype.updateSpriteRelative = function (sprite, actual) {
@@ -170,7 +170,7 @@ var Game = /** @class */ (function () {
         var player = this.findPlayersSprite();
         var offset = player.actual.subtract(sprite.actual);
         // relative for non current player is actually relevant to current
-        var relative = this.viewport.size.divide(2).subtract(offset);
+        var relative = this.viewport.size.shrink(2).subtract(offset);
         return sprite.setRelativePosition(relative);
     };
     return Game;

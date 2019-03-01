@@ -26,13 +26,13 @@ class Vector {
         return new Vector(x, y);
     }
 
-    multiply(scale: number) {
+    scale(scale: number) {
         const x = this.x * scale;
         const y = this.y * scale;
         return new Vector(x, y);
     }
 
-    divide(scale: number) {
+    shrink(scale: number) {
         const x = this.x / scale;
         const y = this.y / scale;
         return new Vector(x, y);
@@ -182,7 +182,7 @@ class Game {
         const player = sprite.setActualPosition(actual);
         // relative for current player is always in the center
         // TODO: is this check needed for all players except current?
-        const relative = this.viewport.size.divide(2);
+        const relative = this.viewport.size.shrink(2);
         return player.setRelativePosition(relative);
     }
 
@@ -191,7 +191,7 @@ class Game {
         const player = this.findPlayersSprite();
         const offset = player.actual.subtract(sprite.actual);
         // relative for non current player is actually relevant to current
-        const relative = this.viewport.size.divide(2).subtract(offset);
+        const relative = this.viewport.size.shrink(2).subtract(offset);
         return sprite.setRelativePosition(relative);
     }
 }

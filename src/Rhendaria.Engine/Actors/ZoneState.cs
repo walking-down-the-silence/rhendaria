@@ -8,9 +8,6 @@ namespace Rhendaria.Engine.Actors
     {
         public HashSet<string> Players { get; set; }
 
-        public bool IsInitialized()
-        {
-            return Players != null;
-        }
+        public bool IsEmpty() => Players == null;
     }
 }

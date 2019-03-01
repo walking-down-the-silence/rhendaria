@@ -41,7 +41,7 @@ function loadGameView(nickname) {
     return __awaiter(this, void 0, void 0, function () {
         var url;
         return __generator(this, function (_a) {
-            url = "http://localhost:54016/api/player/" + nickname;
+            url = "http://localhost:59023/api/player/" + nickname;
             return [2 /*return*/, fetch(url, { method: "GET" })
                     .then(function (result) { return result.json(); })
                     .catch(function (error) { return console.log(error); })];
@@ -66,16 +66,7 @@ var app = (function () {
                         resolution: devicePixelRatio
                     });
                     app.stage.interactive = true;
-                    app.view.addEventListener("mousemove", function (e) {
-                        // TODO: get relative coordinates
-                        //let mouse = {
-                        //    position: Vector.create(e.clientX - container.offsetLeft, e.clientY - container.offsetTop)
-                        //};
-                    });
-                    app.ticker.add(function () { });
-                    resizeRenderingViewport(app.renderer);
                     container = document.getElementById("game-field");
-                    container.appendChild(app.view);
                     return [4 /*yield*/, loadGameView("justmegaara")];
                 case 1:
                     response = _a.sent();
@@ -87,11 +78,26 @@ var app = (function () {
                     return [4 /*yield*/, gameChannel.setupCommunicationChannel()];
                 case 2:
                     _a.sent();
-                    gameChannel.onUpdatePosition(function (nickname, position) {
-                        var actual = Vector.fromRaw(position);
+                    gameChannel.onUpdatePosition(function (nickname, event) {
+                        var actual = Vector.fromRaw(event.position);
                         game.updatePosition(nickname, actual);
                         console.log(game);
                     });
+                    app.view.addEventListener("mousemove", function (event) {
+                        // TODO: get relative coordinates
+                        var x = event.clientX - container.offsetLeft;
+                        var y = event.clientY - container.offsetTop;
+                        var mouse = { position: Vector.create(x, y) };
+                    });
+                    app.view.addEventListener("mouseup", function (event) {
+                        var x = event.clientX - container.offsetLeft;
+                        var y = event.clientY - container.offsetTop;
+                        var vector = Vector.create(x, y);
+                        gameChannel.movePlayer(game.player.nickname, vector);
+                    });
+                    app.ticker.add(function () { });
+                    resizeRenderingViewport(app.renderer);
+                    container.appendChild(app.view);
                     // event subscriptions
                     window.addEventListener("resize", function () { return resizeRenderingViewport(app.renderer); });
                     return [2 /*return*/, app];

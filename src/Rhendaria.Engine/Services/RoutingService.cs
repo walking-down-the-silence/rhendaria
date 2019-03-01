@@ -16,10 +16,13 @@ namespace Rhendaria.Engine.Services
 
         public string GetZoneId(Vector2D position)
         {
-            if (position == null) throw new ArgumentNullException(nameof(position));
+            if (position == null)
+            {
+                throw new ArgumentNullException(nameof(position));
+            }
 
-            int zoneX = position.Left / _zoneOptions.ZoneWidth;
-            int zoneY = position.Top / _zoneOptions.ZoneHeight;
+            int zoneX = (int)(position.X / _zoneOptions.ZoneWidth);
+            int zoneY = (int)(position.Y / _zoneOptions.ZoneHeight);
 
             return $"zone_{zoneX}_{zoneY}";
         }

@@ -4,7 +4,7 @@
  * game view setup and initialization
  **/
 async function loadGameView(nickname: string) {
-    const url = `http://localhost:54016/api/player/${nickname}`;
+    const url = `http://localhost:59023/api/player/${nickname}`;
     return fetch(url, { method: "GET" })
         .then(result => result.json())
         .catch(error => console.log(error));
@@ -26,18 +26,8 @@ let app = (async function () {
         resolution: devicePixelRatio
     });
     app.stage.interactive = true;
-    app.view.addEventListener("mousemove", e => {
-        // TODO: get relative coordinates
-        //let mouse = {
-        //    position: Vector.create(e.clientX - container.offsetLeft, e.clientY - container.offsetTop)
-        //};
-    });
-    app.ticker.add(() => { /* move sprites here */ });
-    resizeRenderingViewport(app.renderer);
 
     const container = document.getElementById("game-field");
-    container.appendChild(app.view);
-
     const response = await loadGameView("justmegaara");
     game = Game.fromRaw(response);
     game.changeViewport(container.offsetWidth, container.offsetHeight);
@@ -46,11 +36,28 @@ let app = (async function () {
 
     const gameChannel = new GameChannel();
     await gameChannel.setupCommunicationChannel();
-    gameChannel.onUpdatePosition((nickname: any, position: any) => {
-        const actual = Vector.fromRaw(position);
+    gameChannel.onUpdatePosition((nickname: any, event: any) => {
+        const actual = Vector.fromRaw(event.position);
         game.updatePosition(nickname, actual);
         console.log(game);
     });
+
+    app.view.addEventListener("mousemove", event => {
+        // TODO: get relative coordinates
+        const x = event.clientX - container.offsetLeft;
+        const y = event.clientY - container.offsetTop;
+        let mouse = { position: Vector.create(x, y) };
+    });
+    app.view.addEventListener("mouseup", event => {
+        const x = event.clientX - container.offsetLeft;
+        const y = event.clientY - container.offsetTop;
+        const vector = Vector.create(x, y);
+        gameChannel.movePlayer(game.player.nickname, vector);
+    });
+    app.ticker.add(() => { /* move sprites here */ });
+    resizeRenderingViewport(app.renderer);
+    
+    container.appendChild(app.view);
 
     // event subscriptions
     window.addEventListener("resize", () => resizeRenderingViewport(app.renderer));

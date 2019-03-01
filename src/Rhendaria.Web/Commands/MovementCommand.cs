@@ -4,7 +4,7 @@ namespace Rhendaria.Web.Commands
 {
     public class MovementCommand
     {
-        public Direction Direction { get; set; }
+        public Vector2D Direction { get; set; }
     }
 
 }

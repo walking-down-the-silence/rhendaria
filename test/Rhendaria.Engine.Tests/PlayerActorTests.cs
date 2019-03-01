@@ -26,8 +26,8 @@ namespace Rhendaria.Engine.Tests
             var actual = player.Move(Direction.Right);
 
             // Assert
-            Assert.Equal(expected.Left, actual.Result.Left);
-            Assert.Equal(expected.Top, actual.Result.Top);
+            Assert.Equal(expected.X, actual.Result.X);
+            Assert.Equal(expected.Y, actual.Result.Y);
 
             cluster.StopAllSilos();
         }
@@ -48,8 +48,8 @@ namespace Rhendaria.Engine.Tests
             var actual = player.GetPosition().Result;
 
             // Assert
-            Assert.Equal(result.Left, actual.Left);
-            Assert.Equal(result.Top, actual.Top);
+            Assert.Equal(result.X, actual.Left);
+            Assert.Equal(result.Y, actual.Top);
         }
 
         private class TestSiloBuilderConfigurator : ISiloBuilderConfigurator

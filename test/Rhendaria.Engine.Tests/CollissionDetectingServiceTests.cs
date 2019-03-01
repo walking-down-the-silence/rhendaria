@@ -17,12 +17,12 @@ namespace Rhendaria.Engine.Tests
 
             var expectedWinner = A.Fake<IPlayerActor>();
             A.CallTo(() => expectedWinner.GetUsername()).Returns(nameof(expectedWinner));
-            A.CallTo(() => expectedWinner.GetSize()).Returns(2);
+            A.CallTo(() => expectedWinner.GetState()).Returns(2);
             A.CallTo(() => expectedWinner.GetPosition()).Returns(new Vector2D(3, 3));
 
             var expectedLooser = A.Fake<IPlayerActor>();
             A.CallTo(() => expectedLooser.GetUsername()).Returns(nameof(expectedLooser));
-            A.CallTo(() => expectedLooser.GetSize()).Returns(1);
+            A.CallTo(() => expectedLooser.GetState()).Returns(1);
             A.CallTo(() => expectedLooser.GetPosition()).Returns(new Vector2D(3, 4));
 
             //Act
@@ -47,17 +47,17 @@ namespace Rhendaria.Engine.Tests
 
             var expectedWinner = A.Fake<IPlayerActor>();
             A.CallTo(() => expectedWinner.GetUsername()).Returns(nameof(expectedWinner));
-            A.CallTo(() => expectedWinner.GetSize()).Returns(5);
+            A.CallTo(() => expectedWinner.GetState()).Returns(5);
             A.CallTo(() => expectedWinner.GetPosition()).Returns(new Vector2D(3, 3));
 
             var expectedLooser1 = A.Fake<IPlayerActor>();
             A.CallTo(() => expectedLooser1.GetUsername()).Returns(nameof(expectedLooser1));
-            A.CallTo(() => expectedLooser1.GetSize()).Returns(2);
+            A.CallTo(() => expectedLooser1.GetState()).Returns(2);
             A.CallTo(() => expectedLooser1.GetPosition()).Returns(new Vector2D(3, 4));
 
             var expectedLooser2 = A.Fake<IPlayerActor>();
             A.CallTo(() => expectedLooser2.GetUsername()).Returns(nameof(expectedLooser2));
-            A.CallTo(() => expectedLooser2.GetSize()).Returns(1);
+            A.CallTo(() => expectedLooser2.GetState()).Returns(1);
             A.CallTo(() => expectedLooser2.GetPosition()).Returns(new Vector2D(2, 3));
 
             //Act
@@ -87,12 +87,12 @@ namespace Rhendaria.Engine.Tests
 
             var expectedWinner = A.Fake<IPlayerActor>();
             A.CallTo(() => expectedWinner.GetUsername()).Returns(nameof(expectedWinner));
-            A.CallTo(() => expectedWinner.GetSize()).Returns(2);
+            A.CallTo(() => expectedWinner.GetState()).Returns(2);
             A.CallTo(() => expectedWinner.GetPosition()).Returns(new Vector2D(0, 0));
 
             var expectedLooser = A.Fake<IPlayerActor>();
             A.CallTo(() => expectedLooser.GetUsername()).Returns(nameof(expectedLooser));
-            A.CallTo(() => expectedLooser.GetSize()).Returns(1);
+            A.CallTo(() => expectedLooser.GetState()).Returns(1);
             A.CallTo(() => expectedLooser.GetPosition()).Returns(new Vector2D(10, 10));
 
             //Act
@@ -110,12 +110,12 @@ namespace Rhendaria.Engine.Tests
 
             var expectedWinner = A.Fake<IPlayerActor>();
             A.CallTo(() => expectedWinner.GetUsername()).Returns(nameof(expectedWinner));
-            A.CallTo(() => expectedWinner.GetSize()).Returns(2);
+            A.CallTo(() => expectedWinner.GetState()).Returns(2);
             A.CallTo(() => expectedWinner.GetPosition()).Returns(new Vector2D(0, 0));
 
             var expectedLooser = A.Fake<IPlayerActor>();
             A.CallTo(() => expectedLooser.GetUsername()).Returns(nameof(expectedLooser));
-            A.CallTo(() => expectedLooser.GetSize()).Returns(2);
+            A.CallTo(() => expectedLooser.GetState()).Returns(2);
             A.CallTo(() => expectedLooser.GetPosition()).Returns(new Vector2D(0, 1));
 
             //Act

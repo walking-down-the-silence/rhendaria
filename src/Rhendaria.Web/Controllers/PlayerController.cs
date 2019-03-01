@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 using Orleans;
-using Rhendaria.Abstraction;
 using Rhendaria.Abstraction.Actors;
 using Rhendaria.Web.Commands;
-using Rhendaria.Web.Hubs;
 using Rhendaria.Web.Models;
+using Rhendaria.Web.Services;
 using System.Threading.Tasks;
 
 namespace Rhendaria.Web.Controllers
@@ -15,12 +13,12 @@ namespace Rhendaria.Web.Controllers
     public class PlayerController : ControllerBase
     {
         private readonly IClusterClient _client;
-        private readonly IHubContext<GameHub> _hubContext;
+        private readonly PlayerMovementService _movementService;
 
-        public PlayerController(IClusterClient client, IHubContext<GameHub> hubContext)
+        public PlayerController(IClusterClient client, PlayerMovementService movementService)
         {
             _client = client;
-            _hubContext = hubContext;
+            _movementService = movementService;
         }
 
         [HttpGet("{nickname}")]
@@ -32,10 +30,7 @@ namespace Rhendaria.Web.Controllers
             }
 
             var playerActor = _client.GetGrain<IPlayerActor>(nickname);
-            var zoneActor = _client.GetGrain<IZoneActor>("zone");
-
-            var position = await playerActor.GetPosition();
-            //var zone = await zoneActor.
+            var state = await playerActor.GetState();
 
             var gameZoneViewModel = new GameModel
             {
@@ -57,7 +52,7 @@ namespace Rhendaria.Web.Controllers
                     {
                         Nickname = nickname,
                         Color = 0x3366FF,
-                        Position = new VectorModel { X = position.Left, Y = position.Top }
+                        Position = new VectorModel { X = state.Position.X, Y = state.Position.Y }
                     },
                     new SpriteModel
                     {
@@ -85,15 +80,7 @@ namespace Rhendaria.Web.Controllers
                 return BadRequest("Username cannot be null or empty.");
             }
 
-            var player = _client.GetGrain<IPlayerActor>(nickname);
-            var zone = _client.GetGrain<IZoneActor>("zone");
-
-            Vector2D position = await player.Move(command.Direction);
-            await zone.RoutePlayerMovement(player);
-
-            var playerPosition = new VectorModel { X = position.Left, Y = position.Top };
-            await _hubContext.Clients.All.SendAsync("UpdatePosition", nickname, playerPosition);
-
+            var playerPosition = await _movementService.MovePlayer(nickname, command.Direction);
             return Ok(playerPosition);
         }
     }
