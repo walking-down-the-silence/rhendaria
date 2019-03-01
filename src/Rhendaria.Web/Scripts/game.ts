@@ -10,27 +10,31 @@ class Vector {
         return new Vector(x, y);
     }
 
+    static fromRaw(raw: any) {
+        return new Vector(raw.x, raw.y);
+    }
+
     add(vector: Vector) {
-        let x = this.x + vector.x;
-        let y = this.y + vector.y;
+        const x = this.x + vector.x;
+        const y = this.y + vector.y;
         return new Vector(x, y);
     }
 
     subtract(vector: Vector) {
-        let x = this.x - vector.x;
-        let y = this.y - vector.y;
+        const x = this.x - vector.x;
+        const y = this.y - vector.y;
         return new Vector(x, y);
     }
 
     multiply(scale: number) {
-        let x = this.x * scale;
-        let y = this.y * scale;
+        const x = this.x * scale;
+        const y = this.y * scale;
         return new Vector(x, y);
     }
 
     divide(scale: number) {
-        let x = this.x / scale;
-        let y = this.y / scale;
+        const x = this.x / scale;
+        const y = this.y / scale;
         return new Vector(x, y);
     }
 }
@@ -52,15 +56,15 @@ class Zone {
     }
 
     static create(topLeft: Vector, bottomRight: Vector) {
-        let box = Rectangle.create(topLeft, bottomRight);
+        const box = Rectangle.create(topLeft, bottomRight);
         return new Zone(box);
     }
 
     static fromRaw(raw: any) {
         if (raw) {
-            let topLeft = Vector.create(raw.box.topLeft.x, raw.box.topLeft.y);
-            let bottomRight = Vector.create(raw.box.bottomRight.x, raw.box.bottomRight.y);
-            let rectangle = Rectangle.create(topLeft, bottomRight);
+            const topLeft = Vector.create(raw.box.topLeft.x, raw.box.topLeft.y);
+            const bottomRight = Vector.create(raw.box.bottomRight.x, raw.box.bottomRight.y);
+            const rectangle = Rectangle.create(topLeft, bottomRight);
             return new Zone(rectangle);
         }
         return null;
@@ -73,7 +77,7 @@ class Viewport {
     }
 
     static create(width: number, height: number) {
-        let size = Vector.create(width, height);
+        const size = Vector.create(width, height);
         return new Viewport(size);
     }
 }
@@ -83,30 +87,32 @@ class Sprite {
         public readonly nickname: string,
         public readonly color: number,
         public readonly actual: Vector,
-        public readonly relative: Vector = null,
+        public readonly relative: Vector,
         public readonly view: PIXI.Graphics = null) {
 
         if (view) {
             this.view = view;
-            this.view.x = actual.x;
-            this.view.y = actual.y;
+            this.view.x = relative.x;
+            this.view.y = relative.y;
         }
         else {
             this.view = new PIXI.Graphics();
             this.view.beginFill(color, 1);
-            this.view.drawCircle(actual.x, actual.y, 50);
+            this.view.drawCircle(relative.x, relative.y, 50);
             this.view.endFill();
         }
     }
 
     static create(nickname: string, color: number, position: Vector) {
-        return new Sprite(nickname, color, position);
+        const relative = Vector.create(0, 0);
+        return new Sprite(nickname, color, position, relative);
     }
 
     static fromRaw(raw: any) {
         if (raw) {
-            let position = Vector.create(raw.position.x, raw.position.y);
-            return new Sprite(raw.nickname, raw.color, position);
+            const position = Vector.create(raw.position.x, raw.position.y);
+            const relative = Vector.create(0, 0);
+            return new Sprite(raw.nickname, raw.color, position, relative);
         }
         return null;
     }
@@ -122,11 +128,11 @@ class Sprite {
 
 class Player {
     private constructor(
-        public readonly sprite: Sprite) {
+        public readonly nickname: string) {
     }
 
-    static create(sprite: Sprite) {
-        return new Player(sprite);
+    static create(nickname: string) {
+        return new Player(nickname);
     }
 }
 
@@ -143,32 +149,49 @@ class Game {
     }
 
     static fromRaw(raw: any) {
-        let viewport = Viewport.create(0, 0);
-        let zone = Zone.fromRaw(raw.zone);
-        let player = Player.create(Sprite.fromRaw(raw.player));
-        let sprites = raw.sprites ? raw.sprites.map(sprite => Sprite.fromRaw(sprite)) : [];
+        const viewport = Viewport.create(0, 0);
+        const zone = Zone.fromRaw(raw.zone);
+        const player = Player.create(raw.player.nickname);
+        const sprites = raw.sprites ? raw.sprites.map(Sprite.fromRaw) : [];
         return new Game(zone, viewport, player, sprites);
     }
 
     changeViewport(width: number, height: number) {
-        let viewport = Viewport.create(width, height);
-        this.viewport = viewport;
+        this.viewport = Viewport.create(width, height);
         return this;
     }
 
     updatePosition(nickname: string, position: Vector) {
-        let sprites = this.sprites.map(sprite => {
-            return sprite.nickname !== nickname
-                ? sprite
-                : this.updateSpritePosition(sprite, position);
-        });
-        this.sprites = sprites;
+        // first update the current player actual position
+        this.sprites = this.sprites.map(sprite => sprite.nickname === nickname
+            ? this.updateSpriteActual(sprite, position)
+            : sprite);
+        // then update all the other sprite relative positions
+        this.sprites = this.sprites.map(sprite => sprite.nickname !== nickname
+            ? this.updateSpriteRelative(sprite, position)
+            : sprite);
         return this;
     }
 
-    private updateSpritePosition(sprite: Sprite, actual: Vector) {
-        let offset = this.player.sprite.actual.subtract(actual);
-        let relative = this.viewport.size.divide(2).subtract(offset);
-        return sprite.setActualPosition(actual).setRelativePosition(relative);
+    private findPlayersSprite() {
+        return this.sprites.find(sprite => sprite.nickname === this.player.nickname);
+    }
+
+    private updateSpriteActual(sprite: Sprite, actual: Vector) {
+        // update actual for current player
+        const player = sprite.setActualPosition(actual);
+        // relative for current player is always in the center
+        // TODO: is this check needed for all players except current?
+        const relative = this.viewport.size.divide(2);
+        return player.setRelativePosition(relative);
+    }
+
+    private updateSpriteRelative(sprite: Sprite, actual: Vector) {
+        // find and set relative for other that current player
+        const player = this.findPlayersSprite();
+        const offset = player.actual.subtract(sprite.actual);
+        // relative for non current player is actually relevant to current
+        const relative = this.viewport.size.divide(2).subtract(offset);
+        return sprite.setRelativePosition(relative);
     }
 }

@@ -4,7 +4,7 @@
  * game view setup and initialization
  **/
 async function loadGameView(nickname: string) {
-    let url = `http://localhost:59023/api/player/${nickname}`;
+    const url = `http://localhost:54016/api/player/${nickname}`;
     return fetch(url, { method: "GET" })
         .then(result => result.json())
         .catch(error => console.log(error));
@@ -12,7 +12,6 @@ async function loadGameView(nickname: string) {
 
 function resizeRenderingViewport(renderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer) {
     const container = document.getElementById("game-field");
-    console.log(container.offsetWidth, container.offsetHeight);
     renderer.resize(container.offsetWidth, container.offsetHeight);
 }
 
@@ -33,29 +32,27 @@ let app = (async function () {
         //    position: Vector.create(e.clientX - container.offsetLeft, e.clientY - container.offsetTop)
         //};
     });
+    app.ticker.add(() => { /* move sprites here */ });
     resizeRenderingViewport(app.renderer);
 
     const container = document.getElementById("game-field");
     container.appendChild(app.view);
 
-    game = await loadGameView("justmegaara")
-        .then(raw => Game.fromRaw(raw))
-        .then(game => game.changeViewport(container.offsetWidth, container.offsetHeight));
-    game.sprites
-        .concat(game.player.sprite)
-        .forEach(sprite => app.stage.addChild(sprite.view));
+    const response = await loadGameView("justmegaara");
+    game = Game.fromRaw(response);
+    game.changeViewport(container.offsetWidth, container.offsetHeight);
+    game.sprites.forEach(sprite => game.updatePosition(sprite.nickname, sprite.actual));
+    game.sprites.forEach(sprite => app.stage.addChild(sprite.view));
 
-
-    let gameChannel = new GameChannel();
+    const gameChannel = new GameChannel();
     await gameChannel.setupCommunicationChannel();
-
     gameChannel.onUpdatePosition((nickname: any, position: any) => {
-        console.log(position);
-        game.updatePosition(nickname, position);
+        const actual = Vector.fromRaw(position);
+        game.updatePosition(nickname, actual);
+        console.log(game);
     });
 
     // event subscriptions
-    app.ticker.add(function () { /* move sprites here */ });
     window.addEventListener("resize", () => resizeRenderingViewport(app.renderer));
 
     return app;

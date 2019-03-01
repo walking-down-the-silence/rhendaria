@@ -7,6 +7,9 @@ var Vector = /** @class */ (function () {
     Vector.create = function (x, y) {
         return new Vector(x, y);
     };
+    Vector.fromRaw = function (raw) {
+        return new Vector(raw.x, raw.y);
+    };
     Vector.prototype.add = function (vector) {
         var x = this.x + vector.x;
         var y = this.y + vector.y;
@@ -70,7 +73,6 @@ var Viewport = /** @class */ (function () {
 }());
 var Sprite = /** @class */ (function () {
     function Sprite(nickname, color, actual, relative, view) {
-        if (relative === void 0) { relative = null; }
         if (view === void 0) { view = null; }
         this.nickname = nickname;
         this.color = color;
@@ -79,23 +81,25 @@ var Sprite = /** @class */ (function () {
         this.view = view;
         if (view) {
             this.view = view;
-            this.view.x = actual.x;
-            this.view.y = actual.y;
+            this.view.x = relative.x;
+            this.view.y = relative.y;
         }
         else {
             this.view = new PIXI.Graphics();
             this.view.beginFill(color, 1);
-            this.view.drawCircle(actual.x, actual.y, 50);
+            this.view.drawCircle(relative.x, relative.y, 50);
             this.view.endFill();
         }
     }
     Sprite.create = function (nickname, color, position) {
-        return new Sprite(nickname, color, position);
+        var relative = Vector.create(0, 0);
+        return new Sprite(nickname, color, position, relative);
     };
     Sprite.fromRaw = function (raw) {
         if (raw) {
             var position = Vector.create(raw.position.x, raw.position.y);
-            return new Sprite(raw.nickname, raw.color, position);
+            var relative = Vector.create(0, 0);
+            return new Sprite(raw.nickname, raw.color, position, relative);
         }
         return null;
     };
@@ -108,11 +112,11 @@ var Sprite = /** @class */ (function () {
     return Sprite;
 }());
 var Player = /** @class */ (function () {
-    function Player(sprite) {
-        this.sprite = sprite;
+    function Player(nickname) {
+        this.nickname = nickname;
     }
-    Player.create = function (sprite) {
-        return new Player(sprite);
+    Player.create = function (nickname) {
+        return new Player(nickname);
     };
     return Player;
 }());
@@ -129,29 +133,45 @@ var Game = /** @class */ (function () {
     Game.fromRaw = function (raw) {
         var viewport = Viewport.create(0, 0);
         var zone = Zone.fromRaw(raw.zone);
-        var player = Player.create(Sprite.fromRaw(raw.player));
-        var sprites = raw.sprites ? raw.sprites.map(function (sprite) { return Sprite.fromRaw(sprite); }) : [];
+        var player = Player.create(raw.player.nickname);
+        var sprites = raw.sprites ? raw.sprites.map(Sprite.fromRaw) : [];
         return new Game(zone, viewport, player, sprites);
     };
     Game.prototype.changeViewport = function (width, height) {
-        var viewport = Viewport.create(width, height);
-        this.viewport = viewport;
+        this.viewport = Viewport.create(width, height);
         return this;
     };
     Game.prototype.updatePosition = function (nickname, position) {
         var _this = this;
-        var sprites = this.sprites.map(function (sprite) {
-            return sprite.nickname !== nickname
-                ? sprite
-                : _this.updateSpritePosition(sprite, position);
-        });
-        this.sprites = sprites;
+        // first update the current player actual position
+        this.sprites = this.sprites.map(function (sprite) { return sprite.nickname === nickname
+            ? _this.updateSpriteActual(sprite, position)
+            : sprite; });
+        // then update all the other sprite relative positions
+        this.sprites = this.sprites.map(function (sprite) { return sprite.nickname !== nickname
+            ? _this.updateSpriteRelative(sprite, position)
+            : sprite; });
         return this;
     };
-    Game.prototype.updateSpritePosition = function (sprite, actual) {
-        var offset = this.player.sprite.actual.subtract(actual);
+    Game.prototype.findPlayersSprite = function () {
+        var _this = this;
+        return this.sprites.find(function (sprite) { return sprite.nickname === _this.player.nickname; });
+    };
+    Game.prototype.updateSpriteActual = function (sprite, actual) {
+        // update actual for current player
+        var player = sprite.setActualPosition(actual);
+        // relative for current player is always in the center
+        // TODO: is this check needed for all players except current?
+        var relative = this.viewport.size.divide(2);
+        return player.setRelativePosition(relative);
+    };
+    Game.prototype.updateSpriteRelative = function (sprite, actual) {
+        // find and set relative for other that current player
+        var player = this.findPlayersSprite();
+        var offset = player.actual.subtract(sprite.actual);
+        // relative for non current player is actually relevant to current
         var relative = this.viewport.size.divide(2).subtract(offset);
-        return sprite.setActualPosition(actual).setRelativePosition(relative);
+        return sprite.setRelativePosition(relative);
     };
     return Game;
 }());

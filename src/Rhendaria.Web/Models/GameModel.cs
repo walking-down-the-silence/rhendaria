@@ -4,7 +4,7 @@ namespace Rhendaria.Web.Models
 {
     public class GameModel
     {
-        public SpriteModel Player { get; set; }
+        public PlayerModel Player { get; set; }
 
         public ICollection<SpriteModel> Sprites { get; set; }
 

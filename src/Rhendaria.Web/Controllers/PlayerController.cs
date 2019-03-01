@@ -39,11 +39,9 @@ namespace Rhendaria.Web.Controllers
 
             var gameZoneViewModel = new GameModel
             {
-                Player = new SpriteModel
+                Player = new PlayerModel
                 {
-                    Nickname = nickname,
-                    Color = 0x3366FF,
-                    Position = new VectorModel { X = position.Left, Y = position.Top }
+                    Nickname = nickname
                 },
                 Zone = new ZoneModel
                 {
@@ -55,6 +53,12 @@ namespace Rhendaria.Web.Controllers
                 },
                 Sprites = new[]
                 {
+                    new SpriteModel
+                    {
+                        Nickname = nickname,
+                        Color = 0x3366FF,
+                        Position = new VectorModel { X = position.Left, Y = position.Top }
+                    },
                     new SpriteModel
                     {
                         Nickname = "sickranchez",

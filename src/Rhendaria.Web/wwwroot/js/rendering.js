@@ -41,7 +41,7 @@ function loadGameView(nickname) {
     return __awaiter(this, void 0, void 0, function () {
         var url;
         return __generator(this, function (_a) {
-            url = "http://localhost:59023/api/player/" + nickname;
+            url = "http://localhost:54016/api/player/" + nickname;
             return [2 /*return*/, fetch(url, { method: "GET" })
                     .then(function (result) { return result.json(); })
                     .catch(function (error) { return console.log(error); })];
@@ -50,14 +50,13 @@ function loadGameView(nickname) {
 }
 function resizeRenderingViewport(renderer) {
     var container = document.getElementById("game-field");
-    console.log(container.offsetWidth, container.offsetHeight);
     renderer.resize(container.offsetWidth, container.offsetHeight);
 }
 var container = document.getElementById("game-field");
 var game = null;
 var app = (function () {
     return __awaiter(this, void 0, void 0, function () {
-        var app, container, gameChannel;
+        var app, container, response, gameChannel;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -73,27 +72,27 @@ var app = (function () {
                         //    position: Vector.create(e.clientX - container.offsetLeft, e.clientY - container.offsetTop)
                         //};
                     });
+                    app.ticker.add(function () { });
                     resizeRenderingViewport(app.renderer);
                     container = document.getElementById("game-field");
                     container.appendChild(app.view);
-                    return [4 /*yield*/, loadGameView("justmegaara")
-                            .then(function (raw) { return Game.fromRaw(raw); })
-                            .then(function (game) { return game.changeViewport(container.offsetWidth, container.offsetHeight); })];
+                    return [4 /*yield*/, loadGameView("justmegaara")];
                 case 1:
-                    game = _a.sent();
-                    game.sprites
-                        .concat(game.player.sprite)
-                        .forEach(function (sprite) { return app.stage.addChild(sprite.view); });
+                    response = _a.sent();
+                    game = Game.fromRaw(response);
+                    game.changeViewport(container.offsetWidth, container.offsetHeight);
+                    game.sprites.forEach(function (sprite) { return game.updatePosition(sprite.nickname, sprite.actual); });
+                    game.sprites.forEach(function (sprite) { return app.stage.addChild(sprite.view); });
                     gameChannel = new GameChannel();
                     return [4 /*yield*/, gameChannel.setupCommunicationChannel()];
                 case 2:
                     _a.sent();
                     gameChannel.onUpdatePosition(function (nickname, position) {
-                        console.log(position);
-                        game.updatePosition(nickname, position);
+                        var actual = Vector.fromRaw(position);
+                        game.updatePosition(nickname, actual);
+                        console.log(game);
                     });
                     // event subscriptions
-                    app.ticker.add(function () { });
                     window.addEventListener("resize", function () { return resizeRenderingViewport(app.renderer); });
                     return [2 /*return*/, app];
             }
