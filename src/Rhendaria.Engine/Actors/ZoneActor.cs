@@ -14,7 +14,8 @@ namespace Rhendaria.Engine.Actors
         private readonly IEventBus _eventBus;
         private readonly IScoreCalculatingService _scoreCalculator;
 
-        public ZoneActor(IGrainFactory grainFactory,
+        public ZoneActor(
+            IGrainFactory grainFactory,
             ICollisionDetectingService collisionDetector,
             IScoreCalculatingService scoreCalculator,
             IEventBus eventBus)

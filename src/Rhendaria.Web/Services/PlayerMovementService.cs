@@ -26,18 +26,27 @@ namespace Rhendaria.Web.Services
             _routingService = routingService;
         }
 
+        public async Task SpawnPlayer(string nickname)
+        {
+            var player = _clusterClient.GetGrain<IPlayerActor>(nickname);
+            var position = await player.GetPosition();
+
+            string zoneId = _routingService.GetZoneId(position);
+            var zone = _clusterClient.GetGrain<IZoneActor>(zoneId);
+            await zone.RoutePlayerMovement(player);
+        }
+
         public async Task<Vector2D> MovePlayer(string nickname, Vector2D direction)
         {
             var player = _clusterClient.GetGrain<IPlayerActor>(nickname);
             var position = await player.Move(direction);
 
-            var zone = _clusterClient.GetGrain<IZoneActor>(_routingService.GetZoneId(position));
+            string zoneId = _routingService.GetZoneId(position);
+            var zone = _clusterClient.GetGrain<IZoneActor>(zoneId);
             await zone.RoutePlayerMovement(player);
 
             var playerPosition = new PlayerPositionChanged(nickname, position);
             await _hubContext.Clients.All.SendAsync(UpdatePositionMethod, nickname, playerPosition);
-            //await Clients.Caller.SendAsync(UpdatePositionMethod, nickname, null);
-            //await Clients.Group("ZONE_GROUP_ID").SendAsync(UpdatePositionMethod, nickname, null);
 
             return position;
         }

@@ -16,6 +16,11 @@ namespace Rhendaria.Engine.Actors
             _options = options;
         }
 
+        public Task<Vector2D> GetPosition()
+        {
+            return Task.FromResult(State.Position);
+        }
+
         public Task<PlayerInfo> GetState()
         {
             var info = new PlayerInfo

@@ -4,7 +4,7 @@
     {
         public string Nickname { get; set; }
 
-        public string SpriteColor { get; set; }
+        public int SpriteColor { get; set; }
 
         public int SpriteSize { get; set; }
 

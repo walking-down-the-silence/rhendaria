@@ -23,9 +23,8 @@ namespace Rhendaria.Abstraction.Extensions
 
         public static Vector2D Shift(this Vector2D source, Vector2D direction, double distance)
         {
-            var xAxis = new Vector2D(10, 0);
             var vector = direction.Subtract(source);
-            double angle = xAxis.Angle(vector);
+            double angle = Vector2D.XAxis.Angle(vector);
             double x = source.X + Cos(angle) * distance;
             double y = source.Y + Sin(angle) * distance * Sign(vector.Y);
             return new Vector2D(x, y);

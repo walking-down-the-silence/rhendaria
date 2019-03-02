@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Rhendaria.Abstraction;
 using Rhendaria.Abstraction.Services;
 using Rhendaria.Engine.Services;
 using Rhendaria.Web.Hubs;
@@ -24,6 +25,9 @@ namespace Rhendaria.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddOptions()
+                .Configure<ZoneOptions>(Configuration.GetSection(nameof(ZoneOptions)));
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 options.CheckConsentNeeded = context => true;

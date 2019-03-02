@@ -48,6 +48,21 @@ function loadGameView(nickname) {
         });
     });
 }
+function parseNickname() {
+    // if the query string is NULL
+    var queryString = window.location.search.substring(1);
+    var queries = queryString.split("&");
+    var value = "";
+    queries.forEach(function (indexQuery) {
+        var indexPair = indexQuery.split("=");
+        var queryKey = decodeURIComponent(indexPair[0]);
+        var queryValue = decodeURIComponent(indexPair.length > 1 ? indexPair[1] : "");
+        if (queryKey == "nickname") {
+            value = queryValue;
+        }
+    });
+    return value;
+}
 function resizeRenderingViewport(renderer) {
     var container = document.getElementById("game-field");
     renderer.resize(container.offsetWidth, container.offsetHeight);
@@ -55,7 +70,7 @@ function resizeRenderingViewport(renderer) {
 var game = null;
 var app = (function () {
     return __awaiter(this, void 0, void 0, function () {
-        var app, gameField, response, gameChannel;
+        var app, nickname, gameField, response, gameChannel;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -65,8 +80,9 @@ var app = (function () {
                         resolution: devicePixelRatio
                     });
                     app.stage.interactive = true;
+                    nickname = parseNickname();
                     gameField = document.getElementById("game-field");
-                    return [4 /*yield*/, loadGameView("justmegaara")];
+                    return [4 /*yield*/, loadGameView(nickname)];
                 case 1:
                     response = _a.sent();
                     game = Game.fromRaw(response);
@@ -80,11 +96,10 @@ var app = (function () {
                     gameChannel.onUpdatePosition(function (nickname, event) {
                         var actual = Vector.fromRaw(event.position);
                         game.updatePosition(nickname, actual);
-                        console.log(game.sprites[0].nickname, game.sprites[0].actual);
                     });
                     // event subscriptions
                     window.addEventListener("resize", function () { return resizeRenderingViewport(app.renderer); });
-                    app.view.addEventListener("mouseup", function (event) {
+                    app.view.addEventListener("mousedown", function (event) {
                         var player = game.findPlayerSprite();
                         var fieldOffset = Vector.create(gameField.offsetLeft, gameField.offsetTop);
                         var mouseOffset = Vector.create(event.clientX, event.clientY);

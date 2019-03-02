@@ -21,8 +21,8 @@ namespace Rhendaria.Engine.Services
                 throw new ArgumentNullException(nameof(position));
             }
 
-            int zoneX = (int)(position.X / _zoneOptions.ZoneWidth);
-            int zoneY = (int)(position.Y / _zoneOptions.ZoneHeight);
+            int zoneX = (int)position.X / _zoneOptions.ZoneWidth;
+            int zoneY = (int)position.Y / _zoneOptions.ZoneHeight;
 
             return $"zone_{zoneX}_{zoneY}";
         }

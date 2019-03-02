@@ -43,17 +43,15 @@ namespace Rhendaria.Web.Controllers
             var zoneActor = _client.GetGrain<IZoneActor>(zoneId);
             var zoneInfo = await zoneActor.GetPlayers();
             var players = zoneInfo.Players.Select(player => player.GetState());
-            await Task.WhenAll(players);
-            var sprites = players.Select(player =>
-            {
-                return new SpriteModel
+            var playerInfos = await Task.WhenAll(players);
+            var sprites = playerInfos
+                .Select(player => new SpriteModel
                 {
-                    Nickname = player.Result.Nickname,
-                    Color = 0x339966,
-                    Position = player.Result.Position
-                };
-            })
-            .ToList();
+                    Nickname = player.Nickname,
+                    Color = player.SpriteColor,
+                    Position = player.Position
+                })
+                .ToList();
 
             var gameZoneViewModel = new GameModel
             {
