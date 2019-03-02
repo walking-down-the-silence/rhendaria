@@ -2,7 +2,6 @@
 using Rhendaria.Abstraction.Actors;
 using Rhendaria.Abstraction.Extensions;
 using Rhendaria.Abstraction.Services;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -26,10 +25,31 @@ namespace Rhendaria.Engine.Actors
             _scoreCalculator = scoreCalculator;
         }
 
+        public Task<ZoneInfo> GetPlayers()
+        {
+            var zoneInfo = new ZoneInfo
+            {
+                Players = State.Players
+                    .Select(player => _grainFactory.GetGrain<IPlayerActor>(player))
+                    .ToList()
+            };
+            return Task.FromResult(zoneInfo);
+        }
+
         public async Task RoutePlayerMovement(IPlayerActor player)
         {
             await RegisterPlayerIfRequired(player);
             await HandleColissionsAsync(player);
+        }
+
+        public override Task OnActivateAsync()
+        {
+            if (State.IsEmpty())
+            {
+                State = ZoneState.Create();
+            }
+
+            return Task.CompletedTask;
         }
 
         private async Task RegisterPlayerIfRequired(IPlayerActor player)
@@ -69,16 +89,6 @@ namespace Rhendaria.Engine.Actors
             }
 
             await WriteStateAsync();
-        }
-
-        public override Task OnActivateAsync()
-        {
-            if (State.IsEmpty())
-            {
-                State.Players = new HashSet<string>();
-            }
-
-            return Task.CompletedTask;
         }
     }
 }

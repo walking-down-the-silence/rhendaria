@@ -50,27 +50,6 @@ class Rectangle {
     }
 }
 
-class Zone {
-    private constructor(
-        public readonly box: Rectangle) {
-    }
-
-    static create(topLeft: Vector, bottomRight: Vector) {
-        const box = Rectangle.create(topLeft, bottomRight);
-        return new Zone(box);
-    }
-
-    static fromRaw(raw: any) {
-        if (raw) {
-            const topLeft = Vector.create(raw.box.topLeft.x, raw.box.topLeft.y);
-            const bottomRight = Vector.create(raw.box.bottomRight.x, raw.box.bottomRight.y);
-            const rectangle = Rectangle.create(topLeft, bottomRight);
-            return new Zone(rectangle);
-        }
-        return null;
-    }
-}
-
 class Viewport {
     private constructor(
         public readonly size: Vector) {
@@ -138,22 +117,20 @@ class Player {
 
 class Game {
     private constructor(
-        public zone: Zone,
         public viewport: Viewport,
         public player: Player,
         public sprites: Sprite[]) {
     }
 
-    static create(zone: Zone, viewport: Viewport, player: Player, sprites: Sprite[]) {
-        return new Game(zone, viewport, player, sprites);
+    static create(viewport: Viewport, player: Player, sprites: Sprite[]) {
+        return new Game(viewport, player, sprites);
     }
 
     static fromRaw(raw: any) {
         const viewport = Viewport.create(0, 0);
-        const zone = Zone.fromRaw(raw.zone);
         const player = Player.create(raw.player.nickname);
         const sprites = raw.sprites ? raw.sprites.map(Sprite.fromRaw) : [];
-        return new Game(zone, viewport, player, sprites);
+        return new Game(viewport, player, sprites);
     }
 
     changeViewport(width: number, height: number) {

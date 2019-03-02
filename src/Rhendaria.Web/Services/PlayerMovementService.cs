@@ -11,6 +11,7 @@ namespace Rhendaria.Web.Services
 {
     public class PlayerMovementService
     {
+        private const string UpdatePositionMethod = "UpdatePosition";
         private readonly IHubContext<GameHub> _hubContext;
         private readonly IClusterClient _clusterClient;
         private readonly IRoutingService _routingService;
@@ -34,7 +35,9 @@ namespace Rhendaria.Web.Services
             await zone.RoutePlayerMovement(player);
 
             var playerPosition = new PlayerPositionChanged(nickname, position);
-            await _hubContext.Clients.All.SendAsync("UpdatePosition", nickname, playerPosition);
+            await _hubContext.Clients.All.SendAsync(UpdatePositionMethod, nickname, playerPosition);
+            //await Clients.Caller.SendAsync(UpdatePositionMethod, nickname, null);
+            //await Clients.Group("ZONE_GROUP_ID").SendAsync(UpdatePositionMethod, nickname, null);
 
             return position;
         }

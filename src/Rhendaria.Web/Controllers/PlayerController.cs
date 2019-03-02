@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Orleans;
 using Rhendaria.Abstraction.Actors;
+using Rhendaria.Abstraction.Services;
 using Rhendaria.Web.Commands;
 using Rhendaria.Web.Models;
 using Rhendaria.Web.Services;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Rhendaria.Web.Controllers
@@ -13,11 +15,16 @@ namespace Rhendaria.Web.Controllers
     public class PlayerController : ControllerBase
     {
         private readonly IClusterClient _client;
+        private readonly IRoutingService _routingService;
         private readonly PlayerMovementService _movementService;
 
-        public PlayerController(IClusterClient client, PlayerMovementService movementService)
+        public PlayerController(
+            IClusterClient client,
+            IRoutingService routingService,
+            PlayerMovementService movementService)
         {
             _client = client;
+            _routingService = routingService;
             _movementService = movementService;
         }
 
@@ -30,43 +37,28 @@ namespace Rhendaria.Web.Controllers
             }
 
             var playerActor = _client.GetGrain<IPlayerActor>(nickname);
-            var state = await playerActor.GetState();
+            var playerInfo = await playerActor.GetState();
+
+            string zoneId = _routingService.GetZoneId(playerInfo.Position);
+            var zoneActor = _client.GetGrain<IZoneActor>(zoneId);
+            var zoneInfo = await zoneActor.GetPlayers();
+            var players = zoneInfo.Players.Select(player => player.GetState());
+            await Task.WhenAll(players);
+            var sprites = players.Select(player =>
+            {
+                return new SpriteModel
+                {
+                    Nickname = player.Result.Nickname,
+                    Color = 0x339966,
+                    Position = player.Result.Position
+                };
+            })
+            .ToList();
 
             var gameZoneViewModel = new GameModel
             {
-                Player = new PlayerModel
-                {
-                    Nickname = nickname
-                },
-                Zone = new ZoneModel
-                {
-                    Box = new BoxModel
-                    {
-                        TopLeft = new VectorModel { X = 1280, Y = 720 },
-                        BottomRight = new VectorModel { X = 2560, Y = 1440 }
-                    }
-                },
-                Sprites = new[]
-                {
-                    new SpriteModel
-                    {
-                        Nickname = nickname,
-                        Color = 0x3366FF,
-                        Position = new VectorModel { X = state.Position.X, Y = state.Position.Y }
-                    },
-                    new SpriteModel
-                    {
-                        Nickname = "sickranchez",
-                        Color = 0x339966,
-                        Position = new VectorModel { X = 1650, Y = 1100 }
-                    },
-                    new SpriteModel
-                    {
-                        Nickname = "alienware51",
-                        Color = 0xFFFF99,
-                        Position = new VectorModel { X = 1800, Y = 1150 }
-                    }
-                }
+                Player = new PlayerModel { Nickname = nickname },
+                Sprites = sprites
             };
 
             return Ok(gameZoneViewModel);

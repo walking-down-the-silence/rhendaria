@@ -1,4 +1,6 @@
-﻿namespace Rhendaria.Web.Models
+﻿using Rhendaria.Abstraction;
+
+namespace Rhendaria.Web.Models
 {
     public class SpriteModel
     {
@@ -6,6 +8,6 @@
 
         public int Color { get; set; }
 
-        public VectorModel Position { get; set; }
+        public Vector2D Position { get; set; }
     }
 }

@@ -42,25 +42,6 @@ var Rectangle = /** @class */ (function () {
     };
     return Rectangle;
 }());
-var Zone = /** @class */ (function () {
-    function Zone(box) {
-        this.box = box;
-    }
-    Zone.create = function (topLeft, bottomRight) {
-        var box = Rectangle.create(topLeft, bottomRight);
-        return new Zone(box);
-    };
-    Zone.fromRaw = function (raw) {
-        if (raw) {
-            var topLeft = Vector.create(raw.box.topLeft.x, raw.box.topLeft.y);
-            var bottomRight = Vector.create(raw.box.bottomRight.x, raw.box.bottomRight.y);
-            var rectangle = Rectangle.create(topLeft, bottomRight);
-            return new Zone(rectangle);
-        }
-        return null;
-    };
-    return Zone;
-}());
 var Viewport = /** @class */ (function () {
     function Viewport(size) {
         this.size = size;
@@ -121,21 +102,19 @@ var Player = /** @class */ (function () {
     return Player;
 }());
 var Game = /** @class */ (function () {
-    function Game(zone, viewport, player, sprites) {
-        this.zone = zone;
+    function Game(viewport, player, sprites) {
         this.viewport = viewport;
         this.player = player;
         this.sprites = sprites;
     }
-    Game.create = function (zone, viewport, player, sprites) {
-        return new Game(zone, viewport, player, sprites);
+    Game.create = function (viewport, player, sprites) {
+        return new Game(viewport, player, sprites);
     };
     Game.fromRaw = function (raw) {
         var viewport = Viewport.create(0, 0);
-        var zone = Zone.fromRaw(raw.zone);
         var player = Player.create(raw.player.nickname);
         var sprites = raw.sprites ? raw.sprites.map(Sprite.fromRaw) : [];
-        return new Game(zone, viewport, player, sprites);
+        return new Game(viewport, player, sprites);
     };
     Game.prototype.changeViewport = function (width, height) {
         this.viewport = Viewport.create(width, height);
