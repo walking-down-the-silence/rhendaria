@@ -153,7 +153,7 @@ var Game = /** @class */ (function () {
             : sprite; });
         return this;
     };
-    Game.prototype.findPlayersSprite = function () {
+    Game.prototype.findPlayerSprite = function () {
         var _this = this;
         return this.sprites.find(function (sprite) { return sprite.nickname === _this.player.nickname; });
     };
@@ -167,7 +167,7 @@ var Game = /** @class */ (function () {
     };
     Game.prototype.updateSpriteRelative = function (sprite, actual) {
         // find and set relative for other that current player
-        var player = this.findPlayersSprite();
+        var player = this.findPlayerSprite();
         var offset = player.actual.subtract(sprite.actual);
         // relative for non current player is actually relevant to current
         var relative = this.viewport.size.shrink(2).subtract(offset);

@@ -173,7 +173,7 @@ class Game {
         return this;
     }
 
-    private findPlayersSprite() {
+    findPlayerSprite() {
         return this.sprites.find(sprite => sprite.nickname === this.player.nickname);
     }
 
@@ -188,7 +188,7 @@ class Game {
 
     private updateSpriteRelative(sprite: Sprite, actual: Vector) {
         // find and set relative for other that current player
-        const player = this.findPlayersSprite();
+        const player = this.findPlayerSprite();
         const offset = player.actual.subtract(sprite.actual);
         // relative for non current player is actually relevant to current
         const relative = this.viewport.size.shrink(2).subtract(offset);

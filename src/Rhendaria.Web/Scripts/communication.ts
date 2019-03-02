@@ -15,8 +15,8 @@ class GameChannel {
         return this.connection.stop();
     }
 
-    movePlayer(nickname: string, position: Vector) {
-        return this.connection.invoke("MovePlayer", nickname, position).catch(err => console.error(err));
+    movePlayer(nickname: string, direction: Vector) {
+        return this.connection.invoke("MovePlayer", nickname, direction).catch(err => console.error(err));
     }
 
     onUpdatePosition(handleUpdatePosition: (nickname: any, position: any) => void) {

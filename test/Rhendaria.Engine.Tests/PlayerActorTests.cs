@@ -23,7 +23,7 @@ namespace Rhendaria.Engine.Tests
             // Act
             cluster.Deploy();
             var player = cluster.GrainFactory.GetGrain<IPlayerActor>("test.user");
-            var actual = player.Move(Direction.Right);
+            var actual = player.Move(new Vector2D(1, 0));
 
             // Assert
             Assert.Equal(expected.X, actual.Result.X);
@@ -44,12 +44,12 @@ namespace Rhendaria.Engine.Tests
             // Act
             cluster.Deploy();
             var player = cluster.GrainFactory.GetGrain<IPlayerActor>("test.user");
-            var result = player.Move(Direction.Right).Result;
-            var actual = player.GetPosition().Result;
+            var result = player.Move(new Vector2D(1, 0)).Result;
+            var actual = player.GetState().Result.Position;
 
             // Assert
-            Assert.Equal(result.X, actual.Left);
-            Assert.Equal(result.Y, actual.Top);
+            Assert.Equal(result.X, actual.X);
+            Assert.Equal(result.Y, actual.Y);
         }
 
         private class TestSiloBuilderConfigurator : ISiloBuilderConfigurator

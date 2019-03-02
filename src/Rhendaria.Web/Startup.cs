@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Rhendaria.Abstraction.Services;
+using Rhendaria.Engine.Services;
 using Rhendaria.Web.Hubs;
 using Rhendaria.Web.Services;
 using Swashbuckle.AspNetCore.Swagger;
@@ -31,8 +33,9 @@ namespace Rhendaria.Web
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddSwaggerGen(ConfigureSwagger);
-            services.AddSingleton(new ClusterClientsFactory(Configuration).CreateInstance());
-            services.AddTransient<PlayerMovementService>();
+            services.AddSingleton(new ClusterClientsFactory(Configuration).CreateInstance())
+                .AddTransient<PlayerMovementService>()
+                .AddTransient<IRoutingService, RoutingService>();
 
             services.AddSignalR();
         }

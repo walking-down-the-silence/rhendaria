@@ -12,8 +12,8 @@ var GameChannel = /** @class */ (function () {
     GameChannel.prototype.teardownCommunicationChannel = function () {
         return this.connection.stop();
     };
-    GameChannel.prototype.movePlayer = function (nickname, position) {
-        return this.connection.invoke("MovePlayer", nickname, position).catch(function (err) { return console.error(err); });
+    GameChannel.prototype.movePlayer = function (nickname, direction) {
+        return this.connection.invoke("MovePlayer", nickname, direction).catch(function (err) { return console.error(err); });
     };
     GameChannel.prototype.onUpdatePosition = function (handleUpdatePosition) {
         this.connection.on("UpdatePosition", handleUpdatePosition);

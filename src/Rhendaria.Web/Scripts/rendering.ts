@@ -15,8 +15,6 @@ function resizeRenderingViewport(renderer: PIXI.WebGLRenderer | PIXI.CanvasRende
     renderer.resize(container.offsetWidth, container.offsetHeight);
 }
 
-const container = document.getElementById("game-field");
-
 let game: Game = null;
 
 let app = (async function () {
@@ -27,10 +25,11 @@ let app = (async function () {
     });
     app.stage.interactive = true;
 
-    const container = document.getElementById("game-field");
+    const gameField = document.getElementById("game-field");
     const response = await loadGameView("justmegaara");
+
     game = Game.fromRaw(response);
-    game.changeViewport(container.offsetWidth, container.offsetHeight);
+    game.changeViewport(gameField.offsetWidth, gameField.offsetHeight);
     game.sprites.forEach(sprite => game.updatePosition(sprite.nickname, sprite.actual));
     game.sprites.forEach(sprite => app.stage.addChild(sprite.view));
 
@@ -39,28 +38,24 @@ let app = (async function () {
     gameChannel.onUpdatePosition((nickname: any, event: any) => {
         const actual = Vector.fromRaw(event.position);
         game.updatePosition(nickname, actual);
-        console.log(game);
+        console.log(game.sprites[0].nickname, game.sprites[0].actual);
     });
-
-    app.view.addEventListener("mousemove", event => {
-        // TODO: get relative coordinates
-        const x = event.clientX - container.offsetLeft;
-        const y = event.clientY - container.offsetTop;
-        let mouse = { position: Vector.create(x, y) };
-    });
-    app.view.addEventListener("mouseup", event => {
-        const x = event.clientX - container.offsetLeft;
-        const y = event.clientY - container.offsetTop;
-        const vector = Vector.create(x, y);
-        gameChannel.movePlayer(game.player.nickname, vector);
-    });
-    app.ticker.add(() => { /* move sprites here */ });
-    resizeRenderingViewport(app.renderer);
-    
-    container.appendChild(app.view);
 
     // event subscriptions
     window.addEventListener("resize", () => resizeRenderingViewport(app.renderer));
+    app.view.addEventListener("mouseup", event => {
+        const player = game.findPlayerSprite();
+        const fieldOffset = Vector.create(gameField.offsetLeft, gameField.offsetTop);
+        const mouseOffset = Vector.create(event.clientX, event.clientY);
+        const offset = mouseOffset
+            .subtract(player.relative)
+            .subtract(fieldOffset);
+        const direction = player.actual.add(offset);
+        gameChannel.movePlayer(player.nickname, direction);
+    });
+
+    resizeRenderingViewport(app.renderer);
+    gameField.appendChild(app.view);
 
     return app;
 })();

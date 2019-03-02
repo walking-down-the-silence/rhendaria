@@ -52,11 +52,10 @@ function resizeRenderingViewport(renderer) {
     var container = document.getElementById("game-field");
     renderer.resize(container.offsetWidth, container.offsetHeight);
 }
-var container = document.getElementById("game-field");
 var game = null;
 var app = (function () {
     return __awaiter(this, void 0, void 0, function () {
-        var app, container, response, gameChannel;
+        var app, gameField, response, gameChannel;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -66,12 +65,12 @@ var app = (function () {
                         resolution: devicePixelRatio
                     });
                     app.stage.interactive = true;
-                    container = document.getElementById("game-field");
+                    gameField = document.getElementById("game-field");
                     return [4 /*yield*/, loadGameView("justmegaara")];
                 case 1:
                     response = _a.sent();
                     game = Game.fromRaw(response);
-                    game.changeViewport(container.offsetWidth, container.offsetHeight);
+                    game.changeViewport(gameField.offsetWidth, gameField.offsetHeight);
                     game.sprites.forEach(function (sprite) { return game.updatePosition(sprite.nickname, sprite.actual); });
                     game.sprites.forEach(function (sprite) { return app.stage.addChild(sprite.view); });
                     gameChannel = new GameChannel();
@@ -81,25 +80,22 @@ var app = (function () {
                     gameChannel.onUpdatePosition(function (nickname, event) {
                         var actual = Vector.fromRaw(event.position);
                         game.updatePosition(nickname, actual);
-                        console.log(game);
+                        console.log(game.sprites[0].nickname, game.sprites[0].actual);
                     });
-                    app.view.addEventListener("mousemove", function (event) {
-                        // TODO: get relative coordinates
-                        var x = event.clientX - container.offsetLeft;
-                        var y = event.clientY - container.offsetTop;
-                        var mouse = { position: Vector.create(x, y) };
-                    });
-                    app.view.addEventListener("mouseup", function (event) {
-                        var x = event.clientX - container.offsetLeft;
-                        var y = event.clientY - container.offsetTop;
-                        var vector = Vector.create(x, y);
-                        gameChannel.movePlayer(game.player.nickname, vector);
-                    });
-                    app.ticker.add(function () { });
-                    resizeRenderingViewport(app.renderer);
-                    container.appendChild(app.view);
                     // event subscriptions
                     window.addEventListener("resize", function () { return resizeRenderingViewport(app.renderer); });
+                    app.view.addEventListener("mouseup", function (event) {
+                        var player = game.findPlayerSprite();
+                        var fieldOffset = Vector.create(gameField.offsetLeft, gameField.offsetTop);
+                        var mouseOffset = Vector.create(event.clientX, event.clientY);
+                        var offset = mouseOffset
+                            .subtract(player.relative)
+                            .subtract(fieldOffset);
+                        var direction = player.actual.add(offset);
+                        gameChannel.movePlayer(player.nickname, direction);
+                    });
+                    resizeRenderingViewport(app.renderer);
+                    gameField.appendChild(app.view);
                     return [2 /*return*/, app];
             }
         });
