@@ -15,11 +15,11 @@ namespace Rhendaria.Abstraction
 
         public double Y { get; }
 
-        public static Vector2D Empty = new Vector2D(0, 0);
+        public static readonly Vector2D Empty = new Vector2D(0, 0);
 
-        public static Vector2D XAxis = new Vector2D(1, 0);
+        public static readonly Vector2D XAxis = new Vector2D(1, 0);
 
-        public static Vector2D YAxis = new Vector2D(0, 1);
+        public static readonly Vector2D YAxis = new Vector2D(0, 1);
 
         public override bool Equals(object obj) => obj is Vector2D v && X == v.X && Y == v.Y;
 
