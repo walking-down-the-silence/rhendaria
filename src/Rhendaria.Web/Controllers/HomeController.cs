@@ -1,21 +1,24 @@
-﻿using System.Diagnostics;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Orleans;
-using Rhendaria.Abstraction;
-using Rhendaria.Abstraction.Actors;
 using Rhendaria.Web.Extensions;
 using Rhendaria.Web.Models;
+using Rhendaria.Web.Services;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Rhendaria.Web.Controllers
 {
     public class HomeController : Controller
     {
         private readonly IClusterClient _client;
+        private readonly PlayerMovementService _movementService;
 
-        public HomeController(IClusterClient client)
+        public HomeController(
+            IClusterClient client,
+            PlayerMovementService movementService)
         {
             _client = client;
+            _movementService = movementService;
         }
 
         [HttpGet]
@@ -27,8 +30,9 @@ namespace Rhendaria.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> JoinGame([Bind] JoinGameViewModel viewModel)
         {
-            string username = await _client.GetGrain<IPlayerActor>(viewModel.Username).GetUsername();
-            return RedirectToAction(nameof(GameController.Index), this.NameOf<GameController>(), new { username });
+            await _movementService.SpawnPlayer(viewModel.Username);
+            var routeValues = new { nickname = viewModel.Username };
+            return RedirectToAction(nameof(GameController.Index), this.NameOf<GameController>(), routeValues);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

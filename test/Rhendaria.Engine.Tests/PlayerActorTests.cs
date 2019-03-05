@@ -11,29 +11,29 @@ namespace Rhendaria.Engine.Tests
     public class PlayerActorTests
     {
         [Fact]
-        public void MoveRight_ShouldHavePositionAt_1_0()
+        public async void MoveRight_ShouldHavePositionAt_1_0()
         {
             // Arrange
             TestClusterBuilder builder = new TestClusterBuilder(1);
             builder.AddSiloBuilderConfigurator<TestSiloBuilderConfigurator>();
             builder.AddClientBuilderConfigurator<TestClientBuilderConfigurator>();
             TestCluster cluster = builder.Build();
-            Vector2D expected = new Vector2D(1, 0);
+            Vector2D expected = new Vector2D(10, 0);
 
             // Act
             cluster.Deploy();
             var player = cluster.GrainFactory.GetGrain<IPlayerActor>("test.user");
-            var actual = player.Move(Direction.Right);
+            var actual = await player.Move(Vector2D.XAxis);
 
             // Assert
-            Assert.Equal(expected.Left, actual.Result.Left);
-            Assert.Equal(expected.Top, actual.Result.Top);
+            Assert.Equal(expected.X, actual.X);
+            Assert.Equal(expected.Y, actual.Y);
 
             cluster.StopAllSilos();
         }
 
         [Fact]
-        public void MoveRight_ReturnResultEqualsActualPosition()
+        public async void MoveRight_ReturnResultEqualsActualPosition()
         {
             // Arrange
             TestClusterBuilder builder = new TestClusterBuilder(1);
@@ -44,12 +44,12 @@ namespace Rhendaria.Engine.Tests
             // Act
             cluster.Deploy();
             var player = cluster.GrainFactory.GetGrain<IPlayerActor>("test.user");
-            var result = player.Move(Direction.Right).Result;
-            var actual = player.GetPosition().Result;
+            var result = await player.Move(Vector2D.XAxis);
+            var actual = await player.GetState();
 
             // Assert
-            Assert.Equal(result.Left, actual.Left);
-            Assert.Equal(result.Top, actual.Top);
+            Assert.Equal(result.X, actual.Position.X);
+            Assert.Equal(result.Y, actual.Position.Y);
         }
 
         private class TestSiloBuilderConfigurator : ISiloBuilderConfigurator

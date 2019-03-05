@@ -10,11 +10,9 @@ namespace Rhendaria.Engine.Services
     {
         public async Task<int> CalculateScore(IPlayerActor winner, ICollection<IPlayerActor> loosers)
         {
-            var tasks = loosers.Select(looser => looser.GetSize());
-
+            var tasks = loosers.Select(looser => looser.GetState());
             var sizes = await Task.WhenAll(tasks);
-
-            return sizes.Sum();
+            return sizes.Select(x => x.SpriteSize).Sum();
         }
     }
 }

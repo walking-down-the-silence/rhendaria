@@ -20,14 +20,17 @@ namespace Rhendaria.Engine.Services
                 .Select(x => x.Target);
 
             var sortedDictionary = new SortedDictionary<int, List<IPlayerActor>>();
+
             foreach (var grain in collided.Append(player))
             {
-                var size = await grain.GetSize();
+                var info = await grain.GetState();
 
-                if (!sortedDictionary.ContainsKey(size))
-                    sortedDictionary.Add(size, new List<IPlayerActor>());
+                if (!sortedDictionary.ContainsKey(info.SpriteSize))
+                {
+                    sortedDictionary.Add(info.SpriteSize, new List<IPlayerActor>());
+                }
 
-                sortedDictionary[size].Add(grain);
+                sortedDictionary[info.SpriteSize].Add(grain);
             }
 
             var loosers = sortedDictionary
@@ -46,30 +49,34 @@ namespace Rhendaria.Engine.Services
             return result;
         }
 
-        private class CollissionCheck
-        {
-            public IPlayerActor Target { get; set; }
-            public bool IsCollided { get; set; }
-        }
-
         private static async Task<CollissionCheck> IsCollidedWith(IPlayerActor player, IPlayerActor targetPlayer)
         {
-            var position = await player.GetPosition();
-            var targetPosition = await targetPlayer.GetPosition();
+            var playerInfo = await player.GetState();
+            var targetInfo = await targetPlayer.GetState();
 
-            var dx = position.Left - targetPosition.Left;
-            var dy = position.Top - targetPosition.Top;
+            var position = playerInfo.Position;
+            var targetPosition = targetInfo.Position;
+
+            var dx = position.X - targetPosition.X;
+            var dy = position.Y - targetPosition.Y;
 
             var distance = Math.Sqrt(dx * dx + dy * dy);
 
-            var radius = await player.GetSize();
-            var tartedRadius = await targetPlayer.GetSize();
+            var radius = playerInfo.SpriteSize;
+            var tartedRadius = targetInfo.SpriteSize;
 
             return new CollissionCheck
             {
                 Target = targetPlayer,
                 IsCollided = distance < radius + tartedRadius
             };
+        }
+
+        private class CollissionCheck
+        {
+            public IPlayerActor Target { get; set; }
+
+            public bool IsCollided { get; set; }
         }
     }
 }

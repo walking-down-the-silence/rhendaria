@@ -5,14 +5,38 @@ namespace Rhendaria.Abstraction
     [Serializable]
     public class Vector2D
     {
-        public Vector2D(int left, int top)
+        public Vector2D(double x, double y)
         {
-            Left = left;
-            Top = top;
+            X = x;
+            Y = y;
         }
 
-        public int Left { get; }
+        public double X { get; }
 
-        public int Top { get; }
+        public double Y { get; }
+
+        public static readonly Vector2D Empty = new Vector2D(0, 0);
+
+        public static readonly Vector2D XAxis = new Vector2D(1, 0);
+
+        public static readonly Vector2D YAxis = new Vector2D(0, 1);
+
+        public override bool Equals(object obj) => obj is Vector2D v && X == v.X && Y == v.Y;
+
+        public override string ToString() => $"X: {X}, Y: {Y}";
+
+        public Vector2D Add(Vector2D vector) => new Vector2D(X + vector.X, Y + vector.Y);
+
+        public Vector2D Subtract(Vector2D vector) => new Vector2D(X - vector.X, Y - vector.Y);
+
+        public Vector2D Scale(double scale) => new Vector2D(X * scale, Y * scale);
+
+        public Vector2D Shrink(double scale) => new Vector2D(X / scale, Y / scale);
+
+        public double Multiply(Vector2D vector) => X * vector.X + Y * vector.Y;
+
+        public double Magnitude() => Math.Sqrt(X * X + Y * Y);
+
+        public double Angle(Vector2D target) => Math.Acos(Multiply(target) / (Magnitude() * target.Magnitude()));
     }
 }

@@ -4,7 +4,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Rhendaria.Abstraction;
+using Rhendaria.Abstraction.Services;
+using Rhendaria.Engine.Services;
 using Rhendaria.Web.Hubs;
+using Rhendaria.Web.Services;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -21,6 +25,9 @@ namespace Rhendaria.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddOptions()
+                .Configure<ZoneOptions>(Configuration.GetSection(nameof(ZoneOptions)));
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 options.CheckConsentNeeded = context => true;
@@ -30,7 +37,9 @@ namespace Rhendaria.Web
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddSwaggerGen(ConfigureSwagger);
-            services.AddSingleton(new ClusterClientsFactory(Configuration).CreateInstance());
+            services.AddSingleton(new ClusterClientsFactory(Configuration).CreateInstance())
+                .AddTransient<PlayerMovementService>()
+                .AddTransient<IRoutingService, RoutingService>();
 
             services.AddSignalR();
         }
@@ -54,6 +63,7 @@ namespace Rhendaria.Web
                 options.OAuthAppName("Swagger UI");
             });
 
+            app.UseDefaultFiles();
             app.UseStaticFiles();
             app.UseCookiePolicy();
 

@@ -1,51 +1,77 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Orleans;
-using Rhendaria.Abstraction;
-using System.Threading.Tasks;
 using Rhendaria.Abstraction.Actors;
+using Rhendaria.Abstraction.Services;
 using Rhendaria.Web.Commands;
+using Rhendaria.Web.Models;
+using Rhendaria.Web.Services;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Rhendaria.Web.Controllers
 {
-    [Route("api/[controller]/{username}")]
+    [Route("api/player")]
     [ApiController]
     public class PlayerController : ControllerBase
     {
         private readonly IClusterClient _client;
+        private readonly IRoutingService _routingService;
+        private readonly PlayerMovementService _movementService;
 
-        public PlayerController(IClusterClient client)
+        public PlayerController(
+            IClusterClient client,
+            IRoutingService routingService,
+            PlayerMovementService movementService)
         {
             _client = client;
+            _routingService = routingService;
+            _movementService = movementService;
         }
 
-        [HttpGet("position")]
-        public async Task<IActionResult> GetUsername(string username)
+        [HttpGet("{nickname}")]
+        public async Task<IActionResult> GetGameView(string nickname)
         {
-            if (string.IsNullOrWhiteSpace(username))
+            if (string.IsNullOrWhiteSpace(nickname))
             {
                 return BadRequest("Username cannot be null or empty.");
             }
 
-            Vector2D position = await _client.GetGrain<IPlayerActor>(username).GetPosition();
-            return Ok(position);
+            var playerActor = _client.GetGrain<IPlayerActor>(nickname);
+            var playerInfo = await playerActor.GetState();
+
+            string zoneId = _routingService.GetZoneId(playerInfo.Position);
+            var zoneActor = _client.GetGrain<IZoneActor>(zoneId);
+            var zoneInfo = await zoneActor.GetPlayers();
+            var players = zoneInfo.Players.Select(player => player.GetState());
+            var playerInfos = await Task.WhenAll(players);
+            var sprites = playerInfos
+                .Select(player => new SpriteModel
+                {
+                    Nickname = player.Nickname,
+                    Color = player.SpriteColor,
+                    Position = player.Position
+                })
+                .ToList();
+
+            var gameZoneViewModel = new GameModel
+            {
+                Player = new PlayerModel { Nickname = nickname },
+                Sprites = sprites
+            };
+
+            return Ok(gameZoneViewModel);
         }
 
-        [HttpPost("move")]
-        public async Task<IActionResult> MovePlayer(string username, [FromBody] MovementCommand command)
+        [HttpPost("{nickname}/move")]
+        public async Task<IActionResult> MovePlayer(string nickname, [FromBody] MovementCommand command)
         {
-            if (string.IsNullOrWhiteSpace(username))
+            if (string.IsNullOrWhiteSpace(nickname))
             {
                 return BadRequest("Username cannot be null or empty.");
             }
 
-            var player = _client.GetGrain<IPlayerActor>(username);
-            var zone = _client.GetGrain<IZoneActor>("zone");
-
-            Vector2D position = await player.Move(command.Direction);
-
-            Task.Run(() => zone.RoutePlayerMovement(player));
-
-            return Ok(position);
+            var playerPosition = await _movementService.MovePlayer(nickname, command.Direction);
+            return Ok(playerPosition);
         }
     }
 }

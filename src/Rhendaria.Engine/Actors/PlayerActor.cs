@@ -1,20 +1,19 @@
-﻿using System.Threading.Tasks;
+﻿using Microsoft.Extensions.Options;
 using Orleans;
 using Rhendaria.Abstraction;
 using Rhendaria.Abstraction.Actors;
 using Rhendaria.Abstraction.Extensions;
+using System.Threading.Tasks;
 
 namespace Rhendaria.Engine.Actors
 {
     public class PlayerActor : Grain<PlayerState>, IPlayerActor
     {
-        public PlayerActor()
-        {
-        }
+        private readonly IOptions<ZoneOptions> _options;
 
-        public Task<string> GetUsername()
+        public PlayerActor(IOptions<ZoneOptions> options)
         {
-            return Task.FromResult(this.GetPrimaryKeyString());
+            _options = options;
         }
 
         public Task<Vector2D> GetPosition()
@@ -22,29 +21,34 @@ namespace Rhendaria.Engine.Actors
             return Task.FromResult(State.Position);
         }
 
-        public Task<int> GetSize()
+        public Task<PlayerInfo> GetState()
         {
-            return Task.FromResult(State.Size);
+            var info = new PlayerInfo
+            {
+                Nickname = this.GetPrimaryKeyString(),
+                Position = State.Position,
+                SpriteColor = State.Color,
+                SpriteSize = State.Size
+            };
+            return Task.FromResult(info);
         }
 
-        public async Task<Vector2D> Move(Direction direction)
+        public async Task<Vector2D> Move(Vector2D direction)
         {
-            Vector2D result = State.Position.Shift(direction);
-            State.Position = result;
-
+            State.Position = State.Position.Shift(direction, 10);
             await WriteStateAsync();
-            return result;
+            return State.Position;
         }
 
         public override Task OnActivateAsync()
         {
-            if (!State.IsInitialized())
+            if (State.IsEmpty())
             {
-                State.Color = "Red";
-                State.Position = new Vector2D(0, 0);
-                State.Size = 3;
+                State = PlayerState.Create(
+                    _options.Value.ZoneWidth,
+                    _options.Value.ZoneHeight);
             }
-      
+
             return Task.CompletedTask;
         }
     }

@@ -8,9 +8,14 @@ namespace Rhendaria.Engine.Actors
     {
         public HashSet<string> Players { get; set; }
 
-        public bool IsInitialized()
+        public static ZoneState Create()
         {
-            return Players != null;
+            return new ZoneState
+            {
+                Players = new HashSet<string>()
+            };
         }
+
+        public bool IsEmpty() => Players == null;
     }
 }

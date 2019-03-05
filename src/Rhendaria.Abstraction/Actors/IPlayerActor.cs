@@ -5,12 +5,10 @@ namespace Rhendaria.Abstraction.Actors
 {
     public interface IPlayerActor : IGrainWithStringKey
     {
-        Task<string> GetUsername();
-
         Task<Vector2D> GetPosition();
 
-        Task<int> GetSize();
+        Task<PlayerInfo> GetState();
 
-        Task<Vector2D> Move(Direction direction);
+        Task<Vector2D> Move(Vector2D direction);
     }
 }
