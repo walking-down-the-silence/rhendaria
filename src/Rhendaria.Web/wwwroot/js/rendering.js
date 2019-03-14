@@ -41,7 +41,7 @@ function loadGameView(nickname) {
     return __awaiter(this, void 0, void 0, function () {
         var url;
         return __generator(this, function (_a) {
-            url = "http://localhost:59023/api/player/" + nickname;
+            url = "api/player/" + nickname;
             return [2 /*return*/, fetch(url, { method: "GET" })
                     .then(function (result) { return result.json(); })
                     .catch(function (error) { return console.log(error); })];
