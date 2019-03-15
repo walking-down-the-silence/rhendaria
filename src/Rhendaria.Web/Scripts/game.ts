@@ -65,7 +65,9 @@ class Sprite {
     private constructor(
         public readonly nickname: string,
         public readonly color: number,
+        // Actual, real position.
         public readonly actual: Vector,
+        // Position relative to main player. For main player is (width/2, height/2).
         public readonly relative: Vector,
         public readonly view: PIXI.Graphics = null) {
 
@@ -135,18 +137,18 @@ class Game {
 
     changeViewport(width: number, height: number) {
         this.viewport = Viewport.create(width, height);
+
         return this;
     }
 
     updatePosition(nickname: string, position: Vector) {
-        // first update the current player actual position
+        // first update the moved player actual position
         this.sprites = this.sprites.map(sprite => sprite.nickname === nickname
             ? this.updateSpriteActual(sprite, position)
             : sprite);
-        // then update all the other sprite relative positions
-        this.sprites = this.sprites.map(sprite => sprite.nickname !== nickname
-            ? this.updateSpriteRelative(sprite, position)
-            : sprite);
+        // then update all the other sprite relative positions.
+        // Current player unchanged in the center.
+        this.sprites = this.sprites.map(sprite => this.updateSpriteRelative(sprite));
         return this;
     }
 
@@ -157,18 +159,20 @@ class Game {
     private updateSpriteActual(sprite: Sprite, actual: Vector) {
         // update actual for current player
         const player = sprite.setActualPosition(actual);
-        // relative for current player is always in the center
-        // TODO: is this check needed for all players except current?
-        const relative = this.viewport.size.shrink(2);
-        return player.setRelativePosition(relative);
+
+        return player;
     }
 
-    private updateSpriteRelative(sprite: Sprite, actual: Vector) {
+    private updateSpriteRelative(sprite: Sprite) {
         // find and set relative for other that current player
         const player = this.findPlayerSprite();
         const offset = player.actual.subtract(sprite.actual);
         // relative for non current player is actually relevant to current
-        const relative = this.viewport.size.shrink(2).subtract(offset);
+
+        const relative = sprite.nickname === player.nickname
+            ? this.viewport.size.shrink(2)
+            : player.relative.subtract(offset);
+
         return sprite.setRelativePosition(relative);
     }
 }
