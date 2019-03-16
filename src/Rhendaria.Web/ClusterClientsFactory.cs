@@ -41,7 +41,7 @@ namespace Rhendaria.Web
 
             int currentAttempts = 0;
                 // Delay not working
-            int maximumAttempts = 10000;
+            int maximumAttempts = 20;
             Task<bool> RetryFunc(Exception exception) => Retry(currentAttempts++, maximumAttempts, exception);
 
             Task.WaitAll(client.Connect(RetryFunc));
@@ -53,7 +53,7 @@ namespace Rhendaria.Web
         {
             switch (exception)
             {
-                case SiloUnavailableException ex:
+                case OrleansException ex:
                     await Task.Delay(TimeSpan.FromSeconds(2));
                     return currentAttempts < maximumAttempts;
                 default:

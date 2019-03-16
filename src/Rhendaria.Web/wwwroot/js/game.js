@@ -53,7 +53,11 @@ var Viewport = /** @class */ (function () {
     return Viewport;
 }());
 var Sprite = /** @class */ (function () {
-    function Sprite(nickname, color, actual, relative, view) {
+    function Sprite(nickname, color, 
+    // Actual, real position.
+    actual, 
+    // Position relative to main player. For main player is (width/2, height/2).
+    relative, view) {
         if (view === void 0) { view = null; }
         this.nickname = nickname;
         this.color = color;
@@ -122,14 +126,13 @@ var Game = /** @class */ (function () {
     };
     Game.prototype.updatePosition = function (nickname, position) {
         var _this = this;
-        // first update the current player actual position
+        // first update the moved player actual position
         this.sprites = this.sprites.map(function (sprite) { return sprite.nickname === nickname
             ? _this.updateSpriteActual(sprite, position)
             : sprite; });
-        // then update all the other sprite relative positions
-        this.sprites = this.sprites.map(function (sprite) { return sprite.nickname !== nickname
-            ? _this.updateSpriteRelative(sprite, position)
-            : sprite; });
+        // then update all the other sprite relative positions.
+        // Current player unchanged in the center.
+        this.sprites = this.sprites.map(function (sprite) { return _this.updateSpriteRelative(sprite); });
         return this;
     };
     Game.prototype.findPlayerSprite = function () {
@@ -139,17 +142,16 @@ var Game = /** @class */ (function () {
     Game.prototype.updateSpriteActual = function (sprite, actual) {
         // update actual for current player
         var player = sprite.setActualPosition(actual);
-        // relative for current player is always in the center
-        // TODO: is this check needed for all players except current?
-        var relative = this.viewport.size.shrink(2);
-        return player.setRelativePosition(relative);
+        return player;
     };
-    Game.prototype.updateSpriteRelative = function (sprite, actual) {
+    Game.prototype.updateSpriteRelative = function (sprite) {
         // find and set relative for other that current player
         var player = this.findPlayerSprite();
         var offset = player.actual.subtract(sprite.actual);
         // relative for non current player is actually relevant to current
-        var relative = this.viewport.size.shrink(2).subtract(offset);
+        var relative = sprite.nickname === player.nickname
+            ? this.viewport.size.shrink(2)
+            : player.relative.subtract(offset);
         return sprite.setRelativePosition(relative);
     };
     return Game;

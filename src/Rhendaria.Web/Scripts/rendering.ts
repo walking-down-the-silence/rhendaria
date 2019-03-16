@@ -4,7 +4,7 @@
  * game view setup and initialization
  **/
 async function loadGameView(nickname: string) {
-    const url = `http://localhost:59023/api/player/${nickname}`;
+    const url = `api/player/${nickname}`;
     return fetch(url, { method: "GET" })
         .then(result => result.json())
         .catch(error => console.log(error));
