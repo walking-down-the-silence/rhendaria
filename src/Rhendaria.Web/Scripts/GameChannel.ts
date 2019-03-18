@@ -1,9 +1,10 @@
-﻿/// <reference types="@aspnet/signalr" />
-
-/**
+﻿/**
  * game communication with backend via websockets
  **/
-class GameChannel {
+import { Vector } from "./Vector";
+import * as signalR from "@aspnet/signalr";
+
+export class GameChannel {
     private connection: signalR.HubConnection;
 
     setupCommunicationChannel() {

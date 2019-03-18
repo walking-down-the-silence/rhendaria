@@ -2,16 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <TypeScriptToolsVersion>3.3</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>3.1</TypeScriptToolsVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Scripts\communication.ts" />
-    <None Remove="Scripts\rendering.ts" />
+    <None Remove="Scripts\GameChannel.ts" />
+    <None Remove="Scripts\index.ts" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Scripts\game.ts" />
+    <Content Include="Scripts\Player.ts" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,12 +35,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\js\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <TypeScriptCompile Include="Scripts\communication.ts" />
-    <TypeScriptCompile Include="Scripts\rendering.ts" />
+    <TypeScriptCompile Include="Scripts\GameChannel.ts" />
+    <TypeScriptCompile Include="Scripts\index.ts" />
   </ItemGroup>
 
 </Project>

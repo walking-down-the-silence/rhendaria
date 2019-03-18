@@ -3,13 +3,18 @@
 /**
  * game view setup and initialization
  **/
+
+import { Game } from "./Game";
+import { GameChannel } from "./GameChannel";
+import { Vector } from "./Vector";
+
 async function loadGameView(nickname: string) {
     const url = `api/player/${nickname}`;
     return fetch(url, { method: "GET" })
         .then(result => result.json())
         .catch(error => console.log(error));
 }
-
+// oasd
 function parseNickname() {
     // if the query string is NULL
     const queryString = window.location.search.substring(1);
@@ -22,7 +27,7 @@ function parseNickname() {
         var queryKey = decodeURIComponent(indexPair[0]);
         var queryValue = decodeURIComponent(indexPair.length > 1 ? indexPair[1] : "");
 
-        if (queryKey == "nickname") {
+        if (queryKey === "nickname") {
             value = queryValue;
         }
     });
