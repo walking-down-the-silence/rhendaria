@@ -6,6 +6,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="OrleansAdoNetContent\**" />
+    <Content Remove="OrleansAdoNetContent\**" />
+    <EmbeddedResource Remove="OrleansAdoNetContent\**" />
+    <None Remove="OrleansAdoNetContent\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="OrleansWebClient.log" />
     <None Remove="Scripts\GameChannel.ts" />
     <None Remove="Scripts\index.ts" />
   </ItemGroup>
@@ -37,6 +45,12 @@
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\GameChannel.ts" />
     <TypeScriptCompile Include="Scripts\index.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Scripts\Geometry\" />
+    <Folder Include="Scripts\_Tests\Helpers\" />
+    <Folder Include="Scripts\_Tests\support\" />
   </ItemGroup>
 
 </Project>

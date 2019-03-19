@@ -11,5 +11,8 @@
   },
   "include": [
     "./Scripts/**/*.ts"
+  ],
+  "exclude": [
+    "Scripts/_Tests/**/*.spec.ts"
   ]
 }
