@@ -1,4 +1,4 @@
-﻿import { Vector } from "./Vector";
+﻿import { Vector2D as Vector } from "./Vector2D";
 
 export class Rectangle {
     private constructor(

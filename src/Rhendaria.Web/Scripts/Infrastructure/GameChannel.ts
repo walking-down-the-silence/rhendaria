@@ -1,7 +1,7 @@
 ﻿/**
  * game communication with backend via websockets
  **/
-import { Vector } from "./Vector";
+import { Vector2D as Vector } from "../Geometry/Vector2D";
 import * as signalR from "@aspnet/signalr";
 
 export class GameChannel {

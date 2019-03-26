@@ -9,6 +9,9 @@
     "esModuleInterop": true,
     "allowJs": false
   },
+  "lib": [
+    "ES2015"
+  ],
   "include": [
     "./Scripts/**/*.ts"
   ],

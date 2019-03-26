@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
 using Orleans;
 using Rhendaria.Abstraction.Actors;
 using Rhendaria.Abstraction.Services;
@@ -7,6 +8,7 @@ using Rhendaria.Web.Models;
 using Rhendaria.Web.Services;
 using System.Linq;
 using System.Threading.Tasks;
+using Rhendaria.Abstraction;
 
 namespace Rhendaria.Web.Controllers
 {
@@ -36,16 +38,17 @@ namespace Rhendaria.Web.Controllers
                 return BadRequest("Username cannot be null or empty.");
             }
 
-            var playerActor = _client.GetGrain<IPlayerActor>(nickname);
-            var playerInfo = await playerActor.GetState();
+            IPlayerActor playerActor = _client.GetGrain<IPlayerActor>(nickname);
+            PlayerInfo playerInfo = await playerActor.GetState();
 
             string zoneId = _routingService.GetZoneId(playerInfo.Position);
-            var zoneActor = _client.GetGrain<IZoneActor>(zoneId);
-            var zoneInfo = await zoneActor.GetPlayers();
+            IZoneActor zoneActor = _client.GetGrain<IZoneActor>(zoneId);
+            ZoneInfo zoneInfo = await zoneActor.GetPlayers();
             var players = zoneInfo.Players.Select(player => player.GetState());
-            var playerInfos = await Task.WhenAll(players);
-            var sprites = playerInfos
-                .Select(player => new SpriteModel
+            PlayerInfo[] playerInfos = await Task.WhenAll(players);
+
+            List<CellModel> sprites = playerInfos
+                .Select(player => new CellModel
                 {
                     Nickname = player.Nickname,
                     Color = player.SpriteColor,
@@ -55,8 +58,14 @@ namespace Rhendaria.Web.Controllers
 
             var gameZoneViewModel = new GameModel
             {
-                Player = new PlayerModel { Nickname = nickname },
-                Sprites = sprites
+                PlayerCell = new CellModel
+                {
+                    Nickname = nickname,
+                    Color = playerInfo.SpriteColor,
+                    Position = playerInfo.Position,
+                    Score = playerInfo.SpriteSize
+                },
+                Cells = sprites
             };
 
             return Ok(gameZoneViewModel);
@@ -70,7 +79,7 @@ namespace Rhendaria.Web.Controllers
                 return BadRequest("Username cannot be null or empty.");
             }
 
-            var playerPosition = await _movementService.MovePlayer(nickname, command.Direction);
+            Vector2D playerPosition = await _movementService.MovePlayer(nickname, command.Direction);
             return Ok(playerPosition);
         }
     }

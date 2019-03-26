@@ -1,7 +1,7 @@
 ﻿import "jasmine";
-import { Vector } from "../Vector";
+import { Vector2D as Vector } from "../Geometry/Vector2D";
 
-describe("Vector", () => {
+describe("Vector2D", () => {
     it("can be created with 0 0",
         () => {
             // Arrange.
