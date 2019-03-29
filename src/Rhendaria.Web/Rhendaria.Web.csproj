@@ -2,16 +2,24 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <TypeScriptToolsVersion>3.3</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>3.1</TypeScriptToolsVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Scripts\communication.ts" />
-    <None Remove="Scripts\rendering.ts" />
+    <Compile Remove="OrleansAdoNetContent\**" />
+    <Content Remove="OrleansAdoNetContent\**" />
+    <EmbeddedResource Remove="OrleansAdoNetContent\**" />
+    <None Remove="OrleansAdoNetContent\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Scripts\game.ts" />
+    <None Remove="OrleansWebClient.log" />
+    <None Remove="Scripts\GameChannel.ts" />
+    <None Remove="Scripts\index.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Scripts\Player.ts" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,12 +43,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\js\" />
+    <TypeScriptCompile Include="Scripts\GameChannel.ts" />
+    <TypeScriptCompile Include="Scripts\index.ts" />
   </ItemGroup>
 
   <ItemGroup>
-    <TypeScriptCompile Include="Scripts\communication.ts" />
-    <TypeScriptCompile Include="Scripts\rendering.ts" />
+    <Folder Include="Scripts\Geometry\" />
+    <Folder Include="Scripts\_Tests\Helpers\" />
+    <Folder Include="Scripts\_Tests\support\" />
   </ItemGroup>
 
 </Project>

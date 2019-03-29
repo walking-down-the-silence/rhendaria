@@ -5,17 +5,24 @@
 <div class="center" id="game-field"></div>
 
 @section Scripts
-{
+    {
     <environment include="Development">
         <script src="~/lib/pixi.js"></script>
-        <script src="~/lib/signalr.js"></script>
     </environment>
     <environment exclude="Development">
         <script src="~/lib/pixi.min.js"></script>
-        <script src="~/lib/signalr.min.js"></script>
     </environment>
-    
-    <script src="~/js/game.js" asp-append-version="true"></script>
-    <script src="~/js/communication.js" asp-append-version="true"></script>
-    <script src="~/js/rendering.js" asp-append-version="true"></script>
+
+    <!--Load vue.js, main.js -->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.5/require.js"></script>
+    <script>
+        require.config({
+            paths: {
+                "index": "./dist/main",
+                "@@aspnet/signalr": "./lib/signalr",
+                "PIXI":"./lib/pixi"
+            }
+        });
+        require(['index']);
+    </script>
 }

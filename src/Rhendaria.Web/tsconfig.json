@@ -1,19 +1,18 @@
 {
   "compilerOptions": {
-    "noImplicitAny": false,
-    "noEmitOnError": true,
-    "removeComments": false,
     "sourceMap": true,
     "target": "es5",
-    "outDir": "wwwroot/js",
-    "lib": [
-      "es2015",
-      "es5",
-      "dom"
-    ]
+    "strict": false,
+    "module": "amd",
+    "outFile": "wwwroot/dist/main.js",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowJs": false
   },
-  "exclude": [
-    "node_modules"
+  "include": [
+    "./Scripts/**/*.ts"
   ],
-  "compileOnSave": true
+  "exclude": [
+    "Scripts/_Tests/**/*.spec.ts"
+  ]
 }
