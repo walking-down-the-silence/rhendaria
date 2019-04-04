@@ -5,6 +5,12 @@ namespace Rhendaria.Abstraction.Actors
 {
     public interface IMessageContainer : IGrainWithStringKey
     {
-        Task InsertMessage();
+        Task Subscribe(IClientEventListener clientEventListener);
+        Task InsertMessage(string message);
+    }
+
+    public interface IClientEventListener : IGrainObserver
+    {
+        void PushMessage(string message);
     }
 }
