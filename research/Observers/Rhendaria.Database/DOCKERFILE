@@ -1,0 +1,6 @@
+FROM library/postgres
+ENV POSTGRES_USER rhendaria
+ENV POSTGRES_PASSWORD rhendaria
+ENV POSTGRES_DB rhendariaDb
+
+COPY init.sql /docker-entrypoint-initdb.d/

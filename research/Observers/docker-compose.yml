@@ -1,0 +1,9 @@
+version: '3.7'
+
+services:
+  db:
+    build:
+      context: ./Rhendaria.Database
+      dockerfile: DOCKERFILE
+    ports:
+      - "5432:5432"
