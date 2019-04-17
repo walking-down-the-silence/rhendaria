@@ -4,7 +4,7 @@
  * game view setup and initialization
  **/
 
-import { Game } from "./Game";
+import { Game } from "./game";
 import { GameChannel } from "./GameChannel";
 import { Vector } from "./Vector";
 

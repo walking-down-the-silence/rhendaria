@@ -330,3 +330,7 @@ ASALocalRun/
 .mfractor/
 
 src/Rhendaria\.Web/wwwroot/dist/
+
+src/Rhendaria\.Hosting/OrleansAdoNetContent/
+
+src/Rhendaria\.Web/OrleansAdoNetContent/
