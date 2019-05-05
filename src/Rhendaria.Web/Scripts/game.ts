@@ -22,12 +22,18 @@ export class Game {
     }
 
     changeViewport(width: number, height: number) {
-        this.viewport = Viewport.create(width, height);
+        this.viewport = Viewport.create(width, height, this.viewport.backSprite);
 
         return this;
     }
 
     updatePosition(nickname: string, position: Vector) {
+        if (nickname === this.player.nickname) {
+            const moveOffset = this.findPlayerSprite().actual.subtract(position);
+            // Shifting background.
+            this.viewport.shift(moveOffset);
+        }
+
         // first update the moved player actual position
         this.sprites = this.sprites.map(sprite => sprite.nickname === nickname
             ? this.updateSpriteActual(sprite, position)
@@ -55,9 +61,12 @@ export class Game {
         const offset = player.actual.subtract(sprite.actual);
         // relative for non current player is actually relevant to current
 
-        const relative = sprite.nickname === player.nickname
-            ? this.viewport.size.shrink(2)
-            : player.relative.subtract(offset);
+        let relative: Vector;
+        if (sprite.nickname === player.nickname) {
+            relative = this.viewport.size.shrink(2);
+        } else {
+            relative = player.relative.subtract(offset);
+        }
 
         return sprite.setRelativePosition(relative);
     }
