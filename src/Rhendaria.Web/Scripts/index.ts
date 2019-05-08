@@ -1,4 +1,4 @@
-﻿/// <reference path="../node_modules/@types/pixi.js/index.d.ts" />
+/// <reference path="../node_modules/@types/pixi.js/index.d.ts" />
 
 /**
  * game view setup and initialization
@@ -14,7 +14,7 @@ async function loadGameView(nickname: string) {
         .then(result => result.json())
         .catch(error => console.log(error));
 }
-// oasd
+
 function parseNickname() {
     // if the query string is NULL
     const queryString = window.location.search.substring(1);
@@ -56,6 +56,7 @@ let app = (async function () {
 
     game = Game.fromRaw(response);
     game.changeViewport(gameField.offsetWidth, gameField.offsetHeight);
+    app.stage.addChild(game.viewport.backSprite);
     game.sprites.forEach(sprite => game.updatePosition(sprite.nickname, sprite.actual));
     game.sprites.forEach(sprite => app.stage.addChild(sprite.view));
 
